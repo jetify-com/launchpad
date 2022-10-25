@@ -1,0 +1,3 @@
+uvicorn
+fastapi
+jetpack-io>=0.5.1.dev202203101646946286

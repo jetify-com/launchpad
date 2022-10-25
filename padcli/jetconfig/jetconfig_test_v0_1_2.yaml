@@ -1,0 +1,18 @@
+configVersion: 0.1.2
+projectId: proj_4pss8bskaTPOWzuhyY7cfL
+name: py-dockerfile
+services:
+  date-printer-cron:
+    type: cron
+    image: busybox:latest
+    instance: nano
+    command: [/bin/sh, -c, date; echo Hello from the Kubernetes cluster]
+    schedule: "* * * * *"
+  ls-cron:
+    type: cron
+    command: [/bin/sh, -c, date; ls -al]
+    schedule: "* * * * *"
+  ghost:
+    type: web
+    image: ghost:4.26.1-alpine
+    url: www.jetpack.io/blog

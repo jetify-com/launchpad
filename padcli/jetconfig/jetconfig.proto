@@ -1,0 +1,11 @@
+syntax = "proto3";
+package jetconfig;
+option go_package = "go.jetpack.io/launchpad/padcli/jetconfig";
+
+enum InstanceType {
+  UNKNOWN = 0;
+  NANO = 1;
+  MICRO = 2;
+  SMALL = 3;
+  MEDIUM = 4;
+}
