@@ -6,8 +6,6 @@ concurrency:
 
 on:
   push:
-    branches-ignore:
-      - main
   workflow_call:
 
 permissions:
