@@ -294,7 +294,7 @@ func (cfg *Config) upgrade(ctx context.Context, filePath string) error {
 	} else if isUnsupported {
 		return errorutil.NewUserErrorf(
 			fmt.Sprintf("The configVersion in %s is too old to auto-upgrade. "+
-				"Please reach out for support, or consult docs at https://www.jetpack.io/docs/reference/%s-reference/", configFileName, configFileName))
+				"Please reach out for support, or consult docs at https://www.jetpack.io/launchpad/docs/reference/launchpad.yaml-reference/", configFileName))
 	}
 
 	if needsUpgrade, err := doesVersionNeedUpgrade(cfg.ConfigVersion); err != nil {

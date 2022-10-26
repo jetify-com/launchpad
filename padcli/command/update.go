@@ -20,8 +20,8 @@ const latestNightlyVersionURL = "https://releases.jetpack.io/jetpack/nightly/ver
 
 // This is a quick and dirty implementation of update that downloads and
 // runs our existing install script.
-// Note that it only works on Linux/BSD systems and it assumes that jetpack is
-// installed in /usr/bin/local. If you call jetpack update from a binary that is
+// Note that it only works on Linux/BSD systems and it assumes that launchpad is
+// installed in /usr/bin/local. If you call launchpad update from a binary that is
 // not in that location, it will still update that location.
 func updateCmd() *cobra.Command {
 	return &cobra.Command{
@@ -31,21 +31,21 @@ func updateCmd() *cobra.Command {
 		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			buildstmp := buildstamp.Get()
-			err := updateJetpack(cmd.Context(), cmd, args, buildstmp)
+			err := updateLaunchpad(cmd.Context(), cmd, args, buildstmp)
 			return errors.Wrap(err, "failed to do update")
 		},
 	}
 }
 
-// updateJetpack will:
+// updateLaunchpad will:
 //  1. query S3 for the latest version of the latest binary, and compare it to
 //     the current version.
 //  2. If the versions are different, it will download the latest binary and then
-//     use the latest binary to execute the current jetpack-command.
+//     use the latest binary to execute the current launchpad-command.
 //
-// The jetpack-command "update" is special-cased internally. In this case,
+// The launchpad-command "update" is special-cased internally. In this case,
 // it will ask the user for confirmation to update.
-func updateJetpack(ctx context.Context, cmd *cobra.Command, args []string, buildstmp buildstamp.BuildStamper) error {
+func updateLaunchpad(ctx context.Context, cmd *cobra.Command, args []string, buildstmp buildstamp.BuildStamper) error {
 	if !buildstmp.IsCicdReleasedBinary() {
 		jetlog.Logger(ctx).Println("You are in development mode. Not checking for updates.")
 		return nil
@@ -58,7 +58,7 @@ func updateJetpack(ctx context.Context, cmd *cobra.Command, args []string, build
 	}
 
 	if currentVersion != latestVersion {
-		jetlog.Logger(ctx).Println("A newer version of jetpack is available. Updating.")
+		jetlog.Logger(ctx).Println("A newer version of launchpad is available. Updating.")
 
 		installScript, err := DownloadScript(scriptURL)
 		if err != nil {
@@ -68,10 +68,10 @@ func updateJetpack(ctx context.Context, cmd *cobra.Command, args []string, build
 		installArgs := []string{"ignoredParam"}
 
 		// We special-case the "update" command to ask for user-confirmation,
-		// and don't call "--exec update" on the newly downloaded jetpack binary.
+		// and don't call "--exec update" on the newly downloaded launchpad binary.
 		if cmd.CalledAs() != "update" {
-			// example: for command path `jetpack auth login`,
-			// drop the `jetpack` and leave `auth login`
+			// example: for command path `launchpad auth login`,
+			// drop the `launchpad` and leave `auth login`
 			installArgs = append(installArgs, "-y", "--exec")
 			// add flags
 			installArgs = append(installArgs, os.Args[1:]...)
@@ -82,7 +82,7 @@ func updateJetpack(ctx context.Context, cmd *cobra.Command, args []string, build
 			return errors.WithStack(err)
 		}
 	} else if cmd.CalledAs() == "update" {
-		jetlog.Logger(ctx).Println("Jetpack version is up-to-date.")
+		jetlog.Logger(ctx).Println("Launchpad version is up-to-date.")
 	}
 	return nil
 }
@@ -99,7 +99,7 @@ func fetchLatestVersion() (string, error) {
 }
 
 func DownloadScript(url string) (string, error) {
-	tmpDir, err := os.MkdirTemp("/tmp", "jetpack-installer")
+	tmpDir, err := os.MkdirTemp("/tmp", "launchpad-installer")
 	if err != nil {
 		return "", errors.Wrapf(err, "Could not create temp directory")
 	}

@@ -35,7 +35,7 @@ const (
 
 // TODO: move all flag messages and flag names to the same place to re-use
 const envOverrideFlagMsg = "Specifies Env file(s) to use. " +
-	"This makes Jetpack ignore environment variables set in `jetpack env`. "
+	"This makes Launchpad ignore environment variables set in `launchpad env`. "
 
 // TODO: Move to a common file
 var green = color.New(color.FgGreen)
@@ -253,7 +253,7 @@ func registerDeployFlags(cmd *cobra.Command, opts *deployOptions) {
 		envOverrideFlagMsg,
 	)
 	// Made env-override file flag hidden temporarily until we decide on concrete approach
-	// on whether override merges with jetpack env or skips it
+	// on whether override merges with launchpad env or skips it
 	_ = cmd.Flags().MarkHidden(envOverrideFlag)
 
 	cmd.Flags().StringVar(
@@ -379,7 +379,7 @@ func readEnvVariables(
 		for key, value := range vars {
 			envVars[key] = base64.StdEncoding.EncodeToString([]byte(value))
 		}
-	} else { // non-encoded values are used for jetpack local
+	} else { // non-encoded values are used for launchpad local
 		envVars = vars
 	}
 	return envVars, nil

@@ -33,7 +33,7 @@ type SurveyAnswers struct {
 func initCmd() *cobra.Command {
 	var initCmd = &cobra.Command{
 		Use:   "init [path]",
-		Short: "init a new jetpack config",
+		Short: "init a new Launchpad config",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, err := cmdOpts.AuthProvider().Identify(cmd.Context())
@@ -121,7 +121,7 @@ func initConfig(ctx context.Context, path string) error {
 	} else if answers.AppType == string(cronjobServiceType) {
 		jetCfg.AddNewCronService(
 			answers.AppName+"-"+jetconfig.CronType,
-			[]string{"/bin/sh", "-c", "date; echo Hello from Jetpack"},
+			[]string{"/bin/sh", "-c", "date; echo Hello from Launchpad"},
 			"* * * * *",
 		)
 	}
@@ -140,13 +140,11 @@ func initConfig(ctx context.Context, path string) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	configFileName := jetconfig.ConfigName(path)
 	jetlog.Logger(ctx).Printf(
 		"\nWritten config file at %s. Be sure to add it to your git "+
 			"repository.\nFor reference guide, visit: "+
-			"https://www.jetpack.io/docs/reference/%s-reference/ \n",
+			"https://www.jetpack.io/launchpad/docs/reference/launchpad.yaml-reference/ \n",
 		configPath,
-		configFileName,
 	)
 	return nil
 }
@@ -163,7 +161,7 @@ func runConfigSurvey(
 	if len(clusters) == 0 {
 		// No clusters available. Show user-friendly error.
 		return nil, errorutil.NewUserError("We were unable to find a kubernetes cluster in your kubeconfig, " +
-			"which is required to use launchpad. You can set one up with Docker or use Jetpack to create one for you")
+			"which is required to use Launchpad. You can set one up with Docker or use Launchpad to create one for you")
 	}
 
 	clusterNames := []string{}
