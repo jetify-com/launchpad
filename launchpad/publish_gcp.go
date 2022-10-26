@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	artifactregistry "cloud.google.com/go/artifactregistry/apiv1beta2"
+	"cloud.google.com/go/artifactregistry/apiv1beta2/artifactregistrypb"
 	"github.com/pkg/errors"
 	"go.jetpack.io/launchpad/pkg/jetlog"
-	pbartifactregistry "google.golang.org/genproto/googleapis/devtools/artifactregistry/v1beta2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -30,10 +30,10 @@ func createGcpRepository(ctx context.Context, plan *PublishPlan) error {
 		return errors.Wrap(err, "failed to get repoRequestParams")
 	}
 
-	req := &pbartifactregistry.CreateRepositoryRequest{
+	req := &artifactregistrypb.CreateRepositoryRequest{
 		Parent: repoRequestParent,
-		Repository: &pbartifactregistry.Repository{
-			Format: pbartifactregistry.Repository_DOCKER,
+		Repository: &artifactregistrypb.Repository{
+			Format: artifactregistrypb.Repository_DOCKER,
 		},
 		RepositoryId: repoId,
 	}
