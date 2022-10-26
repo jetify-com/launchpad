@@ -1,0 +1,70 @@
+run:
+  go: "1.19"
+linters:
+  disable-all: true
+  enable:
+    - dupl
+    - errorlint
+    - errcheck
+    - gofmt
+    - goimports
+    - gosimple
+    - govet
+    - importas
+    - ineffassign
+    - misspell
+    - nilerr
+    - reassign
+
+    - staticcheck
+    # - stylecheck // enable in follow up
+
+    - typecheck
+    - unconvert
+    # - unparam // enable in follow up
+    - unused
+    # - usestdlibvars // enable in follow up
+    - varnamelen
+    # - wrapcheck // maybe enable? This has a ton of errors
+
+    # We'd like to have the following linter enabled, but it's broken for Go
+    # 1.19 as of golangci-lint v1.48.0. Re-enable it when this issue is
+    # fixed: https://github.com/golangci/golangci-lint/issues/2649
+    # - structcheck
+issues:
+  exclude:
+    # It's usually better to start off _not_ wrapping an error unless it
+    # should be part of your API. Errors should be wrapped only when it's
+    # useful.
+    #
+    # See https://go.dev/blog/go1.13-errors
+    - "non-wrapping format verb for fmt.Errorf"
+linters-settings:
+  varnamelen:
+    max-distance: 40 # Progressively lower to 10
+    ignore-decls:
+      - T any
+      - c echo.Context
+      - const C
+      - db database.Db
+      - db db
+      - e error
+      - e watch.Event
+      - f *foo.Bar
+      - i int
+      - id string
+      - m map[string]any
+      - m map[string]int
+      - mc api.CliServiceClient
+      - ns *komponents.Namespace
+      - ns komponents.Namespace
+      - ns string
+      - r *http.Request
+      - t testing.T
+      - vc Context
+      - vc viewer.CommonContext
+      - vc viewer.Context
+      - vc viewer
+      - vc *viewer.MockViewer
+      - w io.Writer
+      - w http.ResponseWriter

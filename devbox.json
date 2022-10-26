@@ -1,5 +1,8 @@
 {
-  "packages": [],
+  "packages": [
+    "go_1_19",
+    "buf"
+  ],
   "shell": {
     "init_hook": null
   }
