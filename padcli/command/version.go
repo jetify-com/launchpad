@@ -8,7 +8,7 @@ import (
 	"go.jetpack.io/launchpad/pkg/jetlog"
 )
 
-const binaryName = "jetpack"
+const binaryName = "launchpad"
 
 func versionCmd() *cobra.Command {
 	verboseFlag := false

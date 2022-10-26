@@ -16,7 +16,7 @@ func (t *Suite) TestPersistentPreRun() {
 
 	dummyCmd := &cobra.Command{
 		Use:   "dummy",
-		Short: "authenticates the user with jetpack",
+		Short: "authenticates the user with Launchpad",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return nil
 		},
@@ -44,6 +44,6 @@ func (t *Suite) TestNoUpdate() {
 		},
 	}
 
-	err := updateJetpack(ctx, cmd, []string{}, buildstmp)
+	err := updateLaunchpad(ctx, cmd, []string{}, buildstmp)
 	req.NoError(err)
 }

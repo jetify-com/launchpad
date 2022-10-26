@@ -121,7 +121,7 @@ func getProjectDir() (string, error) {
 	}
 	// Ignoring the os.Stat error since it will be confusing to the user seeing "Stat /home/launchpad.yaml no such file"
 	return "", errors.New(
-		"'jetpack env' only works within a jetpack project's directory. Please change your current directory to a jetpack project and try again",
+		"'launchpad env' only works within a Launchpad project's directory. Please change your current directory to a Launchpad project and try again",
 	)
 }
 

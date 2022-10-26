@@ -41,7 +41,7 @@ func localCmd() *cobra.Command {
 				return errors.WithStack(err)
 			}
 
-			jetlog.Logger(ctx).Printf("Jetpack is preparing to build %s.\n", jetCfg.GetProjectName())
+			jetlog.Logger(ctx).Printf("Launchpad is preparing to build %s.\n", jetCfg.GetProjectName())
 
 			// Only needed because of --remote-cache:
 			cluster, err := cmdOpts.ClusterProvider().Get(ctx, opts.DefaultedCluster(jetCfg))
@@ -80,7 +80,7 @@ func localCmd() *cobra.Command {
 
 			remoteEnvVars, err := getRemoteEnvVars(ctx, jetCfg, store)
 			if err != nil {
-				return errors.Wrap(err, "failed to retrieve env variables from jetpack env")
+				return errors.Wrap(err, "failed to retrieve env variables from launchpad env")
 			}
 
 			return errors.Wrap(

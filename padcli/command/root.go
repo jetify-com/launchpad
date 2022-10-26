@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"os/signal"
 
 	surveyterminal "github.com/AlecAivazis/survey/v2/terminal"
@@ -72,12 +73,12 @@ func registerRootCmdFlags(cmd *cobra.Command) {
 func NewRootCmd(opts cmdOptions) *cobra.Command {
 	cmdOpts = opts
 	rootCmd := &cobra.Command{
-		Use:   "jetpack",
+		Use:   "launchpad",
 		Short: "Build scalable Kubernetes backends in minutes",
 		Long:  "Build scalable Kubernetes backends in minutes",
 		// If an error occurs then cobra will print the Usage (i.e. --help)
 		// but we don't want that. This still prints usage if user types
-		// --help, or `jetpack help <cmd>`.
+		// --help, or `launchpad help <cmd>`.
 		SilenceUsage: true,
 		// We print the error via special handling in the Execute() function
 		// so we silence it here. If this were false, then we would
@@ -146,7 +147,7 @@ func Execute(ctx context.Context, opts cmdOptions) {
 				os.Exit(1)
 			}
 
-			// user interrupt signals (ctrl+c) are not errors caused by user or jetpack
+			// user interrupt signals (ctrl+c) are not errors caused by user or launchpad
 			// So they need special handling, clean output and graceful shutdown.
 			if errors.Is(err, context.Canceled) || errors.Is(err, surveyterminal.InterruptErr) {
 				fmt.Println("ABORT: Operation cancelled by user interruption.")
@@ -184,20 +185,24 @@ func persistentPreRunE(cmd *cobra.Command, args []string) error {
 	}
 
 	ctx := cmd.Context()
+	binaryName := "launchpad"
+	if _, err := exec.LookPath(binaryName); err != nil {
+		binaryName = "jetpack"
+	}
 	// Auto-updating:
 	autoUpdateBlacklist := map[string]bool{
-		"jetpack help":                          true,
-		"jetpack update":                        true,
-		"jetpack version":                       true,
-		"jetpack auth get-token":                true,
-		"jetpack auth get-registry-credentials": true,
+		fmt.Sprintf("%s help", binaryName):                          true,
+		fmt.Sprintf("%s update", binaryName):                        true,
+		fmt.Sprintf("%s version", binaryName):                       true,
+		fmt.Sprintf("%s auth get-token", binaryName):                true,
+		fmt.Sprintf("%s auth get-registry-credentials", binaryName): true,
 	}
 	if terminal.IsInteractive() &&
 		!cmdOpts.RootFlags().SkipVersionCheck &&
 		!autoUpdateBlacklist[cmd.CommandPath()] {
 
 		buildstmp := buildstamp.Get()
-		if err := updateJetpack(ctx, cmd, args, buildstmp); err != nil {
+		if err := updateLaunchpad(ctx, cmd, args, buildstmp); err != nil {
 			jetlog.Logger(ctx).Print(
 				errors.Wrap(err, "ERROR: failed during auto-update").Error(),
 			)

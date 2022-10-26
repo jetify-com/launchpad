@@ -22,8 +22,7 @@ func downCmd() *cobra.Command {
 		Use:   "down",
 		Short: "uninstalls the app",
 		Long: "uninstalls the app. Uses helm uninstall to remove the app and " +
-			"associated resources. If no more apps in the namespace it also " +
-			"removes the jetpack runtime.",
+			"associated resources.",
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, err := cmdOpts.AuthProvider().Identify(cmd.Context())
@@ -34,7 +33,7 @@ func downCmd() *cobra.Command {
 			c, err := RequireConfigFromFileSystem(ctx, cmd, args)
 			if errors.Is(err, jetconfig.ErrConfigNotFound) {
 				return errorutil.NewUserError(
-					"jetconfig not found. Please run `jetpack down` in jetpack project " +
+					"jetconfig not found. Please run `launchpad down` in launchpad project " +
 						"directory or pass path to directory as parameter.",
 				)
 			} else if err != nil {
@@ -52,7 +51,7 @@ func downCmd() *cobra.Command {
 			fmt.Fprintln(l, "\tNamespace: "+boldSprint(do.Namespace))
 			fmt.Fprintln(l, "\tCluster:   "+boldSprint(do.KubeContext))
 			fmt.Fprintln(l)
-			l.HeaderPrintf("Step 1/1 bringing down App and Jetpack resources...")
+			l.HeaderPrintf("Step 1/1 bringing down App and Launchpad resources...")
 
 			err = launchpad.NewPad(cmdOpts.ErrorLogger()).Down(ctx, do)
 

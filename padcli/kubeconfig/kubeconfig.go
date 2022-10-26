@@ -19,7 +19,6 @@ var (
 )
 
 func MergeAndWrite(newConfig string) error {
-
 	newConfigPath, err := writeTmpFile(newConfig)
 	if err != nil {
 		return errors.Wrap(err, "Error writing kubeconfig to tmp path")

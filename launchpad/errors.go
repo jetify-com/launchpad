@@ -17,7 +17,7 @@ var ErrPodContainerError = errorutil.NewUserError("deployment failed because of 
 var errWaitForPodTimeout = errors.New("Timeout while waiting for pod to be ready")
 
 var MsgUsingProdTrialClusterWhenLoggedOut = "Your kubeconfig is using the trial cluster but you are not logged" +
-	"-in. Please do `jetpack auth login` and try again."
+	"-in. Please do `launchpad auth login` and try again."
 
 // User errors. Should start with errUser. Message will be visible to end user
 var errUserNoGCPCredentials = errorutil.NewUserError(
@@ -33,7 +33,7 @@ var errUserNoDockerClient = errorutil.NewUserError(
 )
 
 var errOldDockerAPIVersion = errorutil.NewUserError(
-	"Jetpack requires your Docker API version to be at least 1.39",
+	"Launchpad requires your Docker API version to be at least 1.39",
 )
 
 var errNoValidChartVersions = errors.New(
@@ -41,7 +41,7 @@ var errNoValidChartVersions = errors.New(
 )
 
 var errUnableToAccessHelmReleases = errorutil.NewUserError(
-	"Unable to access helm releases. You may not have permission to access the cluster or namespace. Please refresh your credentials or do `jetpack auth login` and try again.",
+	"Unable to access helm releases. You may not have permission to access the cluster or namespace. Please refresh your credentials or do `launchpad auth login` and try again.",
 )
 
 var errUserReinstallFail = errorutil.NewUserError(

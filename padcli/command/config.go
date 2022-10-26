@@ -26,7 +26,7 @@ func configCmd() *cobra.Command {
 		Use:   "upgrade [path]",
 		Short: "upgrades a project's launchpad.yaml to follow the latest schema",
 		Long: "upgrades a project's launchpad.yaml to follow the latest schema found " +
-			"at https://www.jetpack.io/docs/reference/launchpad.yaml-reference/",
+			"at https://www.jetpack.io/launchpad/docs/reference/launchpad.yaml-reference/",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, err := cmdOpts.AuthProvider().Identify(cmd.Context())
 			if err != nil {
@@ -73,7 +73,7 @@ func RequireConfigFromFileSystem(
 }
 
 // Loads the launchpad.yaml or jetconfig.yaml file
-// If file does not exist, drop users back into the jetpack init flow
+// If file does not exist, drop users back into the launchpad init flow
 func loadOrInitConfigFromFileSystem(
 	ctx context.Context,
 	cmd *cobra.Command,
@@ -91,9 +91,9 @@ func loadOrInitConfigFromFileSystem(
 
 	configFileName := jetconfig.ConfigName(p)
 	jetlog.Logger(ctx).Printf("Cannot find %s at path %s. "+
-		"Running `jetpack init <app-directory>`\n", configFileName, p)
+		"Running `launchpad init <app-directory>`\n", configFileName, p)
 	jetlog.Logger(ctx).Println(
-		"Setting up your jetpack application. Press `ctrl-c` to exit")
+		"Setting up your launchpad application. Press `ctrl-c` to exit")
 	if err := initConfig(ctx, p); err != nil {
 		return nil, errors.WithStack(err)
 	}
