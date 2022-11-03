@@ -209,17 +209,17 @@ func runConfigSurvey(
 		}
 
 		// Only show the jetpack managed cluster names.
-		clusterNames := []string{createJetpackCluster}
+		clusterNames := []string{}
 		for _, c := range clusters {
 			if c.IsJetpackManaged() {
 				clusterNames = append(clusterNames, c.GetName())
 			}
 		}
-
-		// If no jetpack managed cluster exist, we default the answer to the only option available.
-		if len(clusterNames) == 1 {
-			answers.ClusterOption = clusterNames[0]
+		if len(clusterNames) == 0 {
+			answers.ClusterOption = createJetpackCluster
 		} else {
+			// Add option to select creating a new managed cluster.
+			clusterNames = append(clusterNames, createJetpackCluster)
 			additionalClusterSurvey := surveyJetpackManagedClusterQuestions(ctx, clusterNames)
 			err = survey.Ask([]*survey.Question{additionalClusterSurvey["ClusterOption"]}, &answers.ClusterOption)
 			if err != nil {
