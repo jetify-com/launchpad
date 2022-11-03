@@ -28,15 +28,11 @@ func configCmd() *cobra.Command {
 		Long: "upgrades a project's launchpad.yaml to follow the latest schema found " +
 			"at https://www.jetpack.io/launchpad/docs/reference/launchpad.yaml-reference/",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, err := cmdOpts.AuthProvider().Identify(cmd.Context())
-			if err != nil {
-				return errors.WithStack(err)
-			}
-
+			ctx := cmd.Context()
 			jetlog.Logger(ctx).HeaderPrintf("Step 1/1 checking if the jetconfig needs to upgrade.\n")
 
 			// This calls upgrade internally.
-			_, err = RequireConfigFromFileSystem(ctx, cmd, args)
+			_, err := RequireConfigFromFileSystem(ctx, cmd, args)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -94,7 +90,8 @@ func loadOrInitConfigFromFileSystem(
 		"Running `launchpad init <app-directory>`\n", configFileName, p)
 	jetlog.Logger(ctx).Println(
 		"Setting up your launchpad application. Press `ctrl-c` to exit")
-	if err := initConfig(ctx, p); err != nil {
+
+	if err := initConfig(ctx, cmdOpts.AuthProvider(), p); err != nil {
 		return nil, errors.WithStack(err)
 	}
 	c, err = RequireConfigFromFileSystem(ctx, cmd, cmdArgs)
