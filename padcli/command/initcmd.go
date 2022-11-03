@@ -173,6 +173,8 @@ func runConfigSurvey(
 	}
 	// In case user wants to log in and use a jetpack managed cluster.
 	clusterNames = append(clusterNames, jetpackManagedCluster)
+	// In case user wants to create a cluster.
+	clusterNames = append(clusterNames, createJetpackCluster)
 
 	qs, err := surveyQuestions(ctx, appName, clusterNames)
 	if err != nil {
