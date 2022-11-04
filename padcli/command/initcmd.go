@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.jetpack.io/launchpad/goutil/errorutil"
 	"go.jetpack.io/launchpad/padcli/jetconfig"
+	"go.jetpack.io/launchpad/padcli/provider"
 	"go.jetpack.io/launchpad/pkg/jetlog"
 	"go.jetpack.io/launchpad/pkg/kubevalidate"
 )
@@ -18,8 +19,10 @@ import (
 type serviceTypeOption string
 
 const (
-	webServiceType     serviceTypeOption = "Web Service"
-	cronjobServiceType serviceTypeOption = "Cron Job"
+	webServiceType        serviceTypeOption = "Web Service"
+	cronjobServiceType    serviceTypeOption = "Cron Job"
+	jetpackManagedCluster string            = "Jetpack managed cluster"
+	createJetpackCluster  string            = "Create a new cluster with Jetpack"
 )
 
 type SurveyAnswers struct {
@@ -36,16 +39,13 @@ func initCmd() *cobra.Command {
 		Short: "init a new Launchpad config",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, err := cmdOpts.AuthProvider().Identify(cmd.Context())
-			if err != nil {
-				return errors.WithStack(err)
-			}
+			authProvider := cmdOpts.AuthProvider()
 			path, err := absPath(args)
 			if err != nil {
 				return errors.WithStack(err)
 			}
 
-			return initConfig(ctx, path)
+			return initConfig(cmd.Context(), authProvider, path)
 		},
 	}
 
@@ -85,7 +85,7 @@ func projectDir(args []string) (string, error) {
 	return dir, nil
 }
 
-func initConfig(ctx context.Context, path string) error {
+func initConfig(ctx context.Context, authProvider provider.Auth, path string) error {
 	appName, err := appName(path)
 	if err != nil {
 		return errors.WithStack(err)
@@ -102,11 +102,17 @@ func initConfig(ctx context.Context, path string) error {
 		return errors.WithStack(err)
 	}
 
-	answers, err := runConfigSurvey(ctx, appName)
+	answers, err := runConfigSurvey(ctx, authProvider, appName)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 	if answers == nil {
+		return nil
+	}
+
+	if answers.ClusterOption == createJetpackCluster {
+		// Ask users to create a cluster first.
+		jetlog.Logger(ctx).Printf("\nTo create a new cluster, run `launchpad cluster create <cluster_name>`.\n")
 		return nil
 	}
 
@@ -126,7 +132,7 @@ func initConfig(ctx context.Context, path string) error {
 		)
 	}
 
-	if answers.ClusterOption != "" {
+	if answers.ClusterOption != "" && answers.ClusterOption != createJetpackCluster {
 		jetCfg.Cluster = answers.ClusterOption
 	}
 	if answers.ImageRepositoryLocation != "" {
@@ -146,11 +152,13 @@ func initConfig(ctx context.Context, path string) error {
 			"https://www.jetpack.io/launchpad/docs/reference/launchpad.yaml-reference/ \n",
 		configPath,
 	)
+
 	return nil
 }
 
 func runConfigSurvey(
 	ctx context.Context,
+	authProvider provider.Auth,
 	appName string,
 ) (*SurveyAnswers, error) {
 
@@ -158,16 +166,16 @@ func runConfigSurvey(
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	if len(clusters) == 0 {
-		// No clusters available. Show user-friendly error.
-		return nil, errorutil.NewUserError("We were unable to find a kubernetes cluster in your kubeconfig, " +
-			"which is required to use Launchpad. You can set one up with Docker or use Launchpad to create one for you")
-	}
 
 	clusterNames := []string{}
 	for _, c := range clusters {
 		clusterNames = append(clusterNames, c.GetName())
 	}
+	// In case user wants to log in and use a jetpack managed cluster.
+	clusterNames = append(clusterNames, jetpackManagedCluster)
+	// In case user wants to create a cluster.
+	clusterNames = append(clusterNames, createJetpackCluster)
+
 	qs, err := surveyQuestions(ctx, appName, clusterNames)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -188,6 +196,38 @@ func runConfigSurvey(
 	err = survey.Ask([]*survey.Question{qs["ClusterOption"]}, &answers.ClusterOption)
 	if err != nil {
 		return nil, errors.WithStack(err)
+	}
+
+	if answers.ClusterOption == jetpackManagedCluster {
+		// Prompt users to log in.
+		ctx, err := authProvider.Identify(ctx)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		// Get all the cluster names again.
+		clusters, err := cmdOpts.ClusterProvider().GetAll(ctx)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+
+		// Only show the jetpack managed cluster names.
+		clusterNames := []string{}
+		for _, c := range clusters {
+			if c.IsJetpackManaged() {
+				clusterNames = append(clusterNames, c.GetName())
+			}
+		}
+		if len(clusterNames) == 0 {
+			answers.ClusterOption = createJetpackCluster
+		} else {
+			// Add option to select creating a new managed cluster.
+			clusterNames = append(clusterNames, createJetpackCluster)
+			additionalClusterSurvey := surveyJetpackManagedClusterQuestions(ctx, clusterNames)
+			err = survey.Ask([]*survey.Question{additionalClusterSurvey["ClusterOption"]}, &answers.ClusterOption)
+			if err != nil {
+				return nil, errors.WithStack(err)
+			}
+		}
 	}
 
 	return answers, nil
@@ -240,7 +280,7 @@ func surveyQuestions(ctx context.Context, appName string, clusterNames []string)
 			},
 		},
 		"ClusterOption": {
-			Name: "UseJetpackTrialCluster",
+			Name: "ClusterOption",
 			Prompt: &survey.Select{
 				Message: "To which cluster do you want to deploy this project?",
 				Options: clusterNames,
@@ -256,6 +296,18 @@ func surveyQuestions(ctx context.Context, appName string, clusterNames []string)
 	}
 
 	return questions, nil
+}
+
+func surveyJetpackManagedClusterQuestions(ctx context.Context, clusterNames []string) map[string]*survey.Question {
+	return map[string]*survey.Question{
+		"ClusterOption": {
+			Name: "ClusterOption",
+			Prompt: &survey.Select{
+				Message: "To which jetpack managed cluster do you want to deploy this project?",
+				Options: clusterNames,
+			},
+		},
+	}
 }
 
 func appName(path string) (string, error) {
