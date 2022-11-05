@@ -233,7 +233,7 @@ func getChart(
 	cp, err := cpo.LocateChart(chartURL, settings)
 
 	buildstmp := buildstamp.Get()
-	if err != nil && strings.Contains(err.Error(), "failed to download") && buildstmp.IsDevBinary() {
+	if err != nil && strings.Contains(err.Error(), "failed to fetch") && buildstmp.IsDevBinary() {
 		// This can happen in development because referenced version is dirty and
 		// the helm chart has not been released. In this case, we use the latest chart version.
 		cp, err = getLatestChart(cc, settings, cpo)
