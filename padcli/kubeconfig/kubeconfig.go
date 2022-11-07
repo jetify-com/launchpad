@@ -166,6 +166,19 @@ func GetContextNames() ([]string, error) {
 	return names, nil
 }
 
+func GetAuthInfo(authInfoName string) (*api.AuthInfo, error) {
+	rawCfg, err := getRawKubeConfig()
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if info, ok := rawCfg.AuthInfos[authInfoName]; ok {
+		return info, nil
+	} else {
+		return nil, errors.Errorf("no AuthInfo found with name %s", authInfoName)
+	}
+}
+
 func GetServer(context string) (string, error) {
 	rawCfg, err := getRawKubeConfig()
 	if err != nil {

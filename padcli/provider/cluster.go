@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"strings"
 
 	"github.com/pkg/errors"
 	"go.jetpack.io/launchpad/padcli/kubeconfig"
@@ -117,13 +118,39 @@ func IsLocalCluster(kubeContext string) (bool, error) {
 	return server == dockerDesktop, nil
 }
 
+func isJetpackManagedCluster(kubeContext string) (bool, error) {
+	ctx, err := kubeconfig.GetContext(kubeContext)
+	if err != nil {
+		return false, err
+	}
+	authInfo, err := kubeconfig.GetAuthInfo(ctx.AuthInfo)
+	if err != nil {
+		return false, err
+	}
+
+	// NOTE: this is a hacky way to determine whether a cluster in a kubeconfig is managed
+	// by Jetpack. No other cluster would be using `launchpad` as an auth provider.
+	return authInfo.Exec != nil && strings.HasPrefix(authInfo.Exec.Command, "launchpad"), nil
+}
+
 func toKubeConfigCluster(kubeContextName string) (Cluster, error) {
 	isLocal, err := IsLocalCluster(kubeContextName)
 	if err != nil {
 		return nil, err
 	}
+
+	isJetpackManaged, err := isJetpackManagedCluster(kubeContextName)
+	if err != nil {
+		return nil, err
+	}
+
+	if isJetpackManaged && isLocal {
+		return nil, errors.New("invalid cluster read from kubeconfig; a cluster cannot be local and jetpack-managed at the same time")
+	}
+
 	return &kubeConfigCluster{
 		kubeContextName: kubeContextName,
 		local:           isLocal,
+		jetpackManaged:  isJetpackManaged,
 	}, nil
 }
