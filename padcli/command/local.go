@@ -73,7 +73,7 @@ func localCmd() *cobra.Command {
 				}
 			}
 
-			store, err := newEnvStore(ctx, cmdOpts.EnvSecProvider())
+			store, err := newEnvStore(ctx, cmd, args, cmdOpts.EnvSecProvider())
 			if err != nil {
 				return errors.WithStack(err)
 			}

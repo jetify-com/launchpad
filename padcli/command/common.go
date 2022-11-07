@@ -36,6 +36,10 @@ func getRemoteEnvVars(
 	store envsec.Store,
 ) (map[string]string, error) {
 
+	envVars := map[string]string{}
+	if store == nil {
+		return envVars, nil
+	}
 	// load secrets from parameter store
 	envID, err := cmdOpts.EnvSecProvider().NewEnvId(ctx, jetCfg.GetProjectID(), cmdOpts.RootFlags().Env().String())
 	if err != nil {
@@ -46,7 +50,6 @@ func getRemoteEnvVars(
 		return nil, errors.WithStack(err)
 	}
 
-	envVars := map[string]string{}
 	for _, envVar := range storeEnvVars {
 		envVars[envVar.Name] = envVar.Value
 	}

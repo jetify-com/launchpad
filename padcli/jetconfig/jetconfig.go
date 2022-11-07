@@ -16,11 +16,16 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const JetpackEnvsecProvider = "jetpack"
 const defaultFileName = "launchpad.yaml"
 
 type EnvironmentFields struct {
 	// Default flags
 	Flags FlagSet `yaml:"flags,omitempty"`
+}
+
+type EnvsecFields struct {
+	Provider string `yaml:"provider,omitempty"`
 }
 
 // TODO, make this struct unexported
@@ -36,6 +41,8 @@ type Config struct {
 	// The cluster to deploy to. Should be the unique name of a Jetpack-managed cluster,
 	// or the name of a context in the user's kubeconfig.
 	Cluster string `yaml:"cluster,omitempty"` // --cluster
+
+	Envsec EnvsecFields `yaml:"envsec,omitempty"`
 
 	ImageRepository string `yaml:"imageRepository,omitempty"`
 

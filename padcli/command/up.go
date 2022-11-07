@@ -89,7 +89,7 @@ func upCmd() *cobra.Command {
 				return errors.WithStack(err)
 			}
 
-			store, err := newEnvStore(ctx, cmdOpts.EnvSecProvider())
+			store, err := newEnvStore(ctx, cmd, args, cmdOpts.EnvSecProvider())
 			if err != nil {
 				return errors.WithStack(err)
 			}
