@@ -165,7 +165,7 @@ func autoDeploy(
 			return errors.WithStack(err)
 		}
 
-		store, err := newEnvStore(ctx, cmdOpts.EnvSecProvider())
+		store, err := newEnvStore(ctx, cmd, cmdArgs, cmdOpts.EnvSecProvider())
 		if err != nil {
 			return errors.WithStack(err)
 		}

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -66,7 +67,7 @@ func envCmd() *cobra.Command {
 			}
 			cmdCfg.EnvId = *envId
 
-			store, err := newEnvStore(ctx, cmdOpts.EnvSecProvider())
+			store, err := newEnvStore(ctx, cmd, args, cmdOpts.EnvSecProvider())
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -127,6 +128,8 @@ func getProjectDir() (string, error) {
 
 func newEnvStore(
 	ctx context.Context,
+	cmd *cobra.Command,
+	args []string,
 	envSecProvider provider.EnvSec,
 ) (envsec.Store, error) {
 	storeConfig := &envsec.SSMConfig{}
@@ -149,5 +152,25 @@ func newEnvStore(
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
+	// Set jetconfig Envsec field.
+	path, err := absPath(args)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	jetCfg, err := jetconfig.RequireFromFileSystem(ctx, path, cmdOpts.RootFlags().Env())
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if jetCfg.Envsec.Provider != jetconfig.DefaultEnvsecProvider {
+		jetCfg.Envsec.Provider = jetconfig.DefaultEnvsecProvider
+		_, err = jetCfg.SaveConfig(path)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		fmt.Println("We have updated your project's launchpad.yaml. Please commit that to your repository.")
+	}
+
 	return store, nil
 }
