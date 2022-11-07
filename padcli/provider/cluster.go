@@ -67,7 +67,7 @@ func (c *kubeConfigCluster) IsLocal() bool {
 }
 
 func (c *kubeConfigCluster) IsRemoteUnmanaged() bool {
-	return !c.local
+	return !c.local && !c.jetpackManaged
 }
 
 func (c *kubeConfigCluster) GetIsPrivate() bool {
