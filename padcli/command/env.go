@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -13,6 +12,7 @@ import (
 	"go.jetpack.io/envsec/envcli"
 	"go.jetpack.io/launchpad/padcli/jetconfig"
 	"go.jetpack.io/launchpad/padcli/provider"
+	"go.jetpack.io/launchpad/pkg/jetlog"
 )
 
 type envOptions struct {
@@ -163,13 +163,13 @@ func newEnvStore(
 		return nil, errors.WithStack(err)
 	}
 
-	if jetCfg.Envsec.Provider != jetconfig.DefaultEnvsecProvider {
-		jetCfg.Envsec.Provider = jetconfig.DefaultEnvsecProvider
+	if jetCfg.Envsec.Provider != jetconfig.JetpackEnvsecProvider {
+		jetCfg.Envsec.Provider = jetconfig.JetpackEnvsecProvider
 		_, err = jetCfg.SaveConfig(path)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
-		fmt.Println("We have updated your project's launchpad.yaml. Please commit that to your repository.")
+		jetlog.Logger(ctx).Println("We have updated your project's launchpad.yaml. Please commit that to your repository.")
 	}
 
 	return store, nil

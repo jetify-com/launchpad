@@ -16,7 +16,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const DefaultEnvsecProvider = "jetpack"
+const JetpackEnvsecProvider = "jetpack"
 const defaultFileName = "launchpad.yaml"
 
 type EnvironmentFields struct {
