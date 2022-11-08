@@ -1,7 +1,6 @@
-
 # Launchpad
 
-Launchpad provides the best developer experience for deploying any application to Kubernetes. Skip writing pages of Kubernetes YAML, and deploy in seconds with Launchpad's minimal deployment config.
+Deploy any application to Kubernetes with Launchpad. Skip writing pages of Kubernetes YAML, and deploy in seconds with Launchpad's minimal deployment config.
 
 ### Build and deploy with a single command
 
@@ -9,7 +8,7 @@ Launchpad up can build any image, push to your Docker registry, and generate Hel
 
 ## Get started
 
-https://www.jetpack.io/docs/
+https://www.jetpack.io/launchpad/docs/
 
 ## Build from source
 

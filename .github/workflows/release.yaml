@@ -1,0 +1,31 @@
+name: release
+
+on:
+  # Build/Release on demand
+  workflow_dispatch:
+  push:
+    tags:
+      - "*" # Tags that trigger a new release version
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  tests:
+    uses: ./.github/workflows/tests.yaml
+
+  release:
+    runs-on: ubuntu-latest
+    environment: release
+    needs: tests
+    # Only release when there's a tag for the release.
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Update axiom
+        run: |
+          curl -X POST ${{ secrets.AXIOM_WEBHOOK_URL }} \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.AXIOM_WEBHOOK_SECRET }}" \
+            -d '{"event_type":"update-launchpad-version", "client_payload": {"version":"${{github.ref_name}}"}}'
+ 
