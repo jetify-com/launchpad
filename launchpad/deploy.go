@@ -170,51 +170,6 @@ func (p *Pad) makeDeployPlan(
 	ctx context.Context,
 	opts *DeployOptions,
 ) (*DeployPlan, error) {
-
-	runtimeValues := map[string]any{
-		"image": map[string]any{}, // pre-create for convenience
-		"redis": map[string]any{
-			// "password": this is set later only if needed
-			// See https://github.com/bitnami/charts/tree/master/bitnami/redis#cluster-topologies
-			// for possible cluster topologies. For now using standalone for simplicity
-			// but this can be changed to replication if needed
-			"architecture": "standalone",
-			"auth": map[string]any{
-				// This felt more secure than hardcoding a password here.
-				// When I tried this without using a file (using env instead)
-				// it was not working. Not sure if it was some sort of race condition
-				// with secret creation or something. Once I switched to using password
-				// file it worked as expected.
-				"existingSecret":            RuntimeChartName,
-				"existingSecretPasswordKey": "redis-pass",
-				"usePasswordFiles":          true,
-			},
-			"master": map[string]any{
-				"configuration": "notify-keyspace-events K$z",
-				"persistence": map[string]any{
-					"enabled": opts.IsLocalCluster,
-				},
-			},
-		},
-		"jetpack": map[string]any{
-			// This is set later, only if it is missing. This prevents us from
-			// overriding a pre-existing api-key's secret value.
-			// "apiKeySecret": "",
-		},
-	}
-	buildstmp := buildstamp.Get()
-	if buildstmp.IsDevBinary() {
-		// Dev defaults to latest because the actual version might not exist.
-		// In practice, this means in development the runtime might not update automatically.
-		// use --helm.runtime.set image.tag=[tag] to override
-		// Question: Should this go in cmd package instead?
-		runtimeValues["image"].(map[string]any)["tag"] = "latest"
-	}
-
-	if err := mergo.Merge(&runtimeValues, opts.Runtime.Values, mergo.WithAppendSlice, mergo.WithOverride); err != nil {
-		return nil, errors.Wrap(err, "unable to merge value maps")
-	}
-
 	envVars := map[string]string{}
 	for name, value := range opts.RemoteEnvVars {
 		envVars[name] = base64.StdEncoding.EncodeToString([]byte(value))
@@ -270,8 +225,68 @@ func (p *Pad) makeDeployPlan(
 		DeployOptions: opts,
 		helmDriver:    helmDriver, // empty is fine.
 	}
-	// These get installed in order. Install runtime first so that when we
-	// register the app the runtime is already available.
+
+	// chart config for user app
+	plan.appChartConfig = &ChartConfig{
+		chartLocation: opts.App.ChartLocation,
+		Name:          AppChartName,
+		chartVersion:  appChartVersion,
+		instanceName:  opts.App.InstanceName,
+		Release:       opts.App.ReleaseName,
+		Namespace:     opts.Namespace,
+		values:        appValues,
+		Wait:          true,
+		Timeout:       goutil.Coalesce(opts.App.Timeout, defaultHelmTimeout),
+	}
+
+	if opts.Runtime == nil {
+		// No need to install runtime chart.
+		return plan, nil
+	}
+
+	runtimeValues := map[string]any{
+		"image": map[string]any{}, // pre-create for convenience
+		"redis": map[string]any{
+			// "password": this is set later only if needed
+			// See https://github.com/bitnami/charts/tree/master/bitnami/redis#cluster-topologies
+			// for possible cluster topologies. For now using standalone for simplicity
+			// but this can be changed to replication if needed
+			"architecture": "standalone",
+			"auth": map[string]any{
+				// This felt more secure than hardcoding a password here.
+				// When I tried this without using a file (using env instead)
+				// it was not working. Not sure if it was some sort of race condition
+				// with secret creation or something. Once I switched to using password
+				// file it worked as expected.
+				"existingSecret":            RuntimeChartName,
+				"existingSecretPasswordKey": "redis-pass",
+				"usePasswordFiles":          true,
+			},
+			"master": map[string]any{
+				"configuration": "notify-keyspace-events K$z",
+				"persistence": map[string]any{
+					"enabled": opts.IsLocalCluster,
+				},
+			},
+		},
+		"jetpack": map[string]any{
+			// This is set later, only if it is missing. This prevents us from
+			// overriding a pre-existing api-key's secret value.
+			// "apiKeySecret": "",
+		},
+	}
+	buildstmp := buildstamp.Get()
+	if buildstmp.IsDevBinary() {
+		// Dev defaults to latest because the actual version might not exist.
+		// In practice, this means in development the runtime might not update automatically.
+		// use --helm.runtime.set image.tag=[tag] to override
+		// Question: Should this go in cmd package instead?
+		runtimeValues["image"].(map[string]any)["tag"] = "latest"
+	}
+
+	if err := mergo.Merge(&runtimeValues, opts.Runtime.Values, mergo.WithAppendSlice, mergo.WithOverride); err != nil {
+		return nil, errors.Wrap(err, "unable to merge value maps")
+	}
 
 	runtimeChartConfig := &ChartConfig{
 		chartLocation: opts.Runtime.ChartLocation,
@@ -333,19 +348,6 @@ func (p *Pad) makeDeployPlan(
 		}
 		plan.runtimeChartConfig = runtimeChartConfig
 		// END OF WARNING
-	}
-
-	// chart config for user app
-	plan.appChartConfig = &ChartConfig{
-		chartLocation: opts.App.ChartLocation,
-		Name:          AppChartName,
-		chartVersion:  appChartVersion,
-		instanceName:  opts.App.InstanceName,
-		Release:       opts.App.ReleaseName,
-		Namespace:     opts.Namespace,
-		values:        appValues,
-		Wait:          true,
-		Timeout:       goutil.Coalesce(opts.App.Timeout, defaultHelmTimeout),
 	}
 
 	return plan, nil
