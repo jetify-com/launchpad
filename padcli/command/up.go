@@ -46,7 +46,6 @@ type publishOptions struct {
 }
 
 type upOptions struct {
-	jflags.Common
 	deployOptions
 	embeddedBuildOptions
 	publishOptions
@@ -79,7 +78,7 @@ func upCmd() *cobra.Command {
 				return errors.WithStack(err)
 			}
 
-			cluster, err := cmdOpts.ClusterProvider().Get(ctx, opts.DefaultedCluster(jetCfg))
+			cluster, err := cmdOpts.ClusterProvider().Get(ctx)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -144,7 +143,7 @@ func upCmd() *cobra.Command {
 }
 
 func registerUpFlags(cmd *cobra.Command, opts *upOptions) {
-	jflags.RegisterCommonFlags(cmd, &opts.Common)
+	jflags.RegisterCommonFlags(cmd, cmdOpts)
 	registerDeployFlags(cmd, &opts.deployOptions)
 	registerEmbeddedBuildFlags(cmd, &opts.embeddedBuildOptions)
 	registerPublishFlags(cmd, &opts.publishOptions)

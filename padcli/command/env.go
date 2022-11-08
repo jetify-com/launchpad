@@ -48,7 +48,7 @@ func envCmd() *cobra.Command {
 				return errors.WithStack(err)
 			}
 
-			c, err := RequireConfigFromFileSystem(ctx, cmd, []string{absProjectPath})
+			c, err := RequireConfigFromFileSystem(ctx, cmd, []string{absProjectPath}, cmdOpts)
 			if err != nil {
 				return errors.WithStack(err)
 			}

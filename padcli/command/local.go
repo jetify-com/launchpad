@@ -44,7 +44,7 @@ func localCmd() *cobra.Command {
 			jetlog.Logger(ctx).Printf("Launchpad is preparing to build %s.\n", jetCfg.GetProjectName())
 
 			// Only needed because of --remote-cache:
-			cluster, err := cmdOpts.ClusterProvider().Get(ctx, opts.DefaultedCluster(jetCfg))
+			cluster, err := cmdOpts.ClusterProvider().Get(ctx)
 			if err != nil {
 				return errors.WithStack(err)
 			}

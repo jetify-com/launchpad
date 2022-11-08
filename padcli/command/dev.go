@@ -27,7 +27,6 @@ import (
 type devOptions struct {
 	deployOptions
 	embeddedBuildOptions
-	jflags.Common
 	publishOptions
 }
 
@@ -87,7 +86,7 @@ func devCmd() *cobra.Command {
 }
 
 func registerDevFlags(cmd *cobra.Command, opts *devOptions) {
-	jflags.RegisterCommonFlags(cmd, &opts.Common)
+	jflags.RegisterCommonFlags(cmd, cmdOpts)
 	registerDeployFlags(cmd, &opts.deployOptions)
 	registerEmbeddedBuildFlags(cmd, &opts.embeddedBuildOptions)
 	registerPublishFlags(cmd, &opts.publishOptions)
@@ -141,7 +140,7 @@ func autoDeploy(
 		}
 
 		// If the selected cluster is a Jetpack-managed cluster, use its public hostname.
-		cluster, err := cmdOpts.ClusterProvider().Get(ctx, opts.DefaultedCluster(jetCfg))
+		cluster, err := cmdOpts.ClusterProvider().Get(ctx)
 		if err != nil {
 			logsAndPortFwdCancelFn()
 			return errors.WithStack(err)

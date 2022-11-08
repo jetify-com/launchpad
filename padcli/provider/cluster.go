@@ -23,10 +23,13 @@ type Cluster interface {
 
 type ClusterProvider interface {
 	// Get returns the preferred Cluster to be used for the current command.
-	Get(ctx context.Context, kubeContextName string) (Cluster, error)
+	Get(ctx context.Context) (Cluster, error)
 
 	// GetAll returns all Clusters available to the user. May be empty.
 	GetAll(ctx context.Context) ([]Cluster, error)
+
+	GetSelectedClusterName() *string
+	SetSelectedClusterName(name string)
 }
 
 type kubeConfigCluster struct {
@@ -78,7 +81,9 @@ func (c *kubeConfigCluster) GetName() string {
 	return c.GetKubeContext()
 }
 
-type kubeConfigClusterProvider struct{}
+type kubeConfigClusterProvider struct {
+	selectedCluster string
+}
 
 var _ ClusterProvider = (*kubeConfigClusterProvider)(nil)
 
@@ -86,8 +91,8 @@ func KubeConfigClusterProvider() ClusterProvider {
 	return &kubeConfigClusterProvider{}
 }
 
-func (p *kubeConfigClusterProvider) Get(ctx context.Context, kubeContextName string) (Cluster, error) {
-	return toKubeConfigCluster(kubeContextName)
+func (p *kubeConfigClusterProvider) Get(ctx context.Context) (Cluster, error) {
+	return toKubeConfigCluster(p.selectedCluster)
 }
 
 func (p *kubeConfigClusterProvider) GetAll(ctx context.Context) ([]Cluster, error) {
@@ -106,6 +111,14 @@ func (p *kubeConfigClusterProvider) GetAll(ctx context.Context) ([]Cluster, erro
 	}
 
 	return clusters, nil
+}
+
+func (p *kubeConfigClusterProvider) GetSelectedClusterName() *string {
+	return &p.selectedCluster
+}
+
+func (p *kubeConfigClusterProvider) SetSelectedClusterName(name string) {
+	p.selectedCluster = name
 }
 
 func IsLocalCluster(kubeContext string) (bool, error) {

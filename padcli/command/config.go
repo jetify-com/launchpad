@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.jetpack.io/launchpad/padcli/jetconfig"
+	"go.jetpack.io/launchpad/padcli/provider"
 	"go.jetpack.io/launchpad/pkg/jetlog"
 )
 
@@ -32,7 +33,7 @@ func configCmd() *cobra.Command {
 			jetlog.Logger(ctx).HeaderPrintf("Step 1/1 checking if the jetconfig needs to upgrade.\n")
 
 			// This calls upgrade internally.
-			_, err := RequireConfigFromFileSystem(ctx, cmd, args)
+			_, err := RequireConfigFromFileSystem(ctx, cmd, args, cmdOpts)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -50,6 +51,7 @@ func RequireConfigFromFileSystem(
 	ctx context.Context,
 	cmd *cobra.Command,
 	cmdArgs []string,
+	providers provider.Providers,
 ) (*jetconfig.Config, error) {
 	p, err := absPath(cmdArgs)
 	if err != nil {
@@ -65,6 +67,11 @@ func RequireConfigFromFileSystem(
 	if !c.HasDefaultFileName() {
 		jetlog.Logger(ctx).Printf("Using config at %s\n\n", c.Path)
 	}
+
+	if *providers.ClusterProvider().GetSelectedClusterName() == "" {
+		providers.ClusterProvider().SetSelectedClusterName(c.Cluster)
+	}
+
 	return c, nil
 }
 
@@ -75,7 +82,7 @@ func loadOrInitConfigFromFileSystem(
 	cmd *cobra.Command,
 	cmdArgs []string,
 ) (*jetconfig.Config, error) {
-	c, err := RequireConfigFromFileSystem(ctx, cmd, cmdArgs)
+	c, err := RequireConfigFromFileSystem(ctx, cmd, cmdArgs, cmdOpts)
 	if !errors.Is(err, jetconfig.ErrConfigNotFound) {
 		return c, errors.WithStack(err)
 	}
@@ -94,7 +101,7 @@ func loadOrInitConfigFromFileSystem(
 	if err := initConfig(ctx, cmdOpts.AuthProvider(), p); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	c, err = RequireConfigFromFileSystem(ctx, cmd, cmdArgs)
+	c, err = RequireConfigFromFileSystem(ctx, cmd, cmdArgs, cmdOpts)
 	return c, errors.WithStack(err)
 }
 
