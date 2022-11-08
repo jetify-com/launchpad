@@ -323,14 +323,12 @@ func (p *Pad) makeDeployPlan(
 		return err == nil && isInstalled
 	}
 
-	// Optimization: skip jetpack-runtime if we can.
-	installRuntime, _ := appValues["jetpack"].(map[string]any)["runSDKRegister"].(bool)
-	if installRuntime && runtimeIsCurrent() {
+	if runtimeIsCurrent() {
 		jetlog.Logger(ctx).IndentedPrintf(
 			"\nSkipping upgrade of %s because there are no changes\n",
 			runtimeChartConfig.Release,
 		)
-	} else if installRuntime {
+	} else {
 		secretData, err := GetRuntimeSecretData(ctx, opts.KubeContext, opts.Namespace)
 		if err != nil {
 			return nil, errors.WithStack(err)
