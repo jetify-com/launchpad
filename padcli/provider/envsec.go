@@ -8,7 +8,7 @@ import (
 )
 
 type EnvSec interface {
-	Get(context.Context) (EnvSecConfig, error)
+	Get(context.Context, string) (EnvSecConfig, error)
 	NewEnvId(ctx context.Context, projectId string, env string) (*envsec.EnvId, error)
 }
 
@@ -27,7 +27,7 @@ func DefaultEnvSecProvider() EnvSec {
 	return &defaultEnvSec{}
 }
 
-func (p *defaultEnvSec) Get(ctx context.Context) (EnvSecConfig, error) {
+func (p *defaultEnvSec) Get(ctx context.Context, selectedProvider string) (EnvSecConfig, error) {
 	return nil, nil
 }
 

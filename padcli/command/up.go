@@ -64,11 +64,7 @@ func upCmd() *cobra.Command {
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: validateDeployUptions(&opts.deployOptions),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, err := cmdOpts.AuthProvider().Identify(cmd.Context())
-			if err != nil {
-				return errors.WithStack(err)
-			}
-
+			ctx := cmd.Context()
 			absPath, err := projectDir(args)
 			if err != nil {
 				return errors.WithStack(err)
@@ -77,18 +73,22 @@ func upCmd() *cobra.Command {
 			if err != nil {
 				return errors.WithStack(err)
 			}
-
+			ctx, err = cmdOpts.AuthProvider().Identify(cmd.Context())
+			if err != nil {
+				return errors.WithStack(err)
+			}
 			cluster, err := cmdOpts.ClusterProvider().Get(ctx)
 			if err != nil {
 				return errors.WithStack(err)
 			}
 
-			repoConfig, err := cmdOpts.RepositoryProvider().Get(ctx, cluster)
+			imageRepo := goutil.Coalesce(opts.ImageRepo, jetCfg.ImageRepository)
+			repoConfig, err := cmdOpts.RepositoryProvider().Get(ctx, cluster, imageRepo)
 			if err != nil {
 				return errors.WithStack(err)
 			}
 
-			store, err := newEnvStore(ctx, cmd, args, cmdOpts.EnvSecProvider())
+			store, err := newEnvStore(ctx, cmd, args, cmdOpts.EnvSecProvider(), jetCfg.Envsec.Provider)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -101,7 +101,7 @@ func upCmd() *cobra.Command {
 				jetCfg,
 				&opts.embeddedBuildOptions,
 				&opts.deployOptions,
-				goutil.Coalesce(opts.ImageRepo, jetCfg.ImageRepository),
+				imageRepo,
 				absPath,
 				cluster,
 				repoConfig,

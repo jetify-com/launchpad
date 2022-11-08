@@ -5,7 +5,7 @@ import (
 )
 
 type Repository interface {
-	Get(context.Context, Cluster) (RepoConfig, error)
+	Get(context.Context, Cluster, string) (RepoConfig, error)
 }
 
 type RepoConfig interface {
@@ -25,6 +25,7 @@ func EmptyRepository() Repository {
 func (p *emptyRepository) Get(
 	ctx context.Context,
 	c Cluster,
+	imageRepo string,
 ) (RepoConfig, error) {
 	return nil, nil
 }
