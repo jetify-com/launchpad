@@ -2,13 +2,14 @@ package jflags
 
 import (
 	"github.com/spf13/cobra"
+	"go.jetpack.io/launchpad/padcli/provider"
 )
 
 func NewDownCmd() *DownCmd {
 	return &DownCmd{}
 }
 
-func RegisterDownFlags(cmd *cobra.Command, flags *DownCmd) {
+func RegisterDownFlags(cmd *cobra.Command, flags *DownCmd, p provider.Providers) {
 	cmd.Flags().StringVarP(
 		&flags.namespace,
 		"namespace",
@@ -22,12 +23,10 @@ func RegisterDownFlags(cmd *cobra.Command, flags *DownCmd) {
 		"",
 		"App install name",
 	)
-	RegisterCommonFlags(cmd, &flags.Common)
+	RegisterCommonFlags(cmd, p)
 }
 
 type DownCmd struct {
-	Common
-
 	app       string
 	namespace string
 }

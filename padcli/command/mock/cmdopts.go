@@ -109,7 +109,6 @@ func (*mockUser) Email() string {
 
 func (*mockClusterProvider) Get(
 	ctx context.Context,
-	kubeContextName string,
 ) (provider.Cluster, error) {
 	return NewClusterForTest("local", true), nil
 }
@@ -123,6 +122,12 @@ func (*mockClusterProvider) GetAll(
 		NewJetpackManagedClusterForTest("remote-not-jetpack", "byoc-cluster"),
 	}, nil
 }
+
+func (p *mockClusterProvider) GetSelectedClusterName() *string {
+	return nil
+}
+
+func (p *mockClusterProvider) SetSelectedClusterName(name string) {}
 
 func (*mockNamespaceProvider) Get(
 	ctx context.Context,

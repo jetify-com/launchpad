@@ -88,7 +88,7 @@ func (t *Suite) TestBuildPublishAndDeploy() {
 	req.NoError(err)
 
 	cmdOpts.RootFlags().Environment = "dev"
-	jetCfg, err = RequireConfigFromFileSystem(ctx, cmd, []string{configPath})
+	jetCfg, err = RequireConfigFromFileSystem(ctx, cmd, []string{configPath}, cmdOpts)
 	req.NoError(err)
 
 	// Copy the files under testdata to the temp directory

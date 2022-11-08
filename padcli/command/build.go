@@ -27,7 +27,6 @@ type embeddedBuildOptions struct {
 	BuildArgs   map[string]string
 	LocalImage  string
 	RemoteCache bool
-	jflags.Common
 }
 
 type buildOptions struct {
@@ -59,7 +58,7 @@ func buildCmd() *cobra.Command {
 			}
 
 			// Only needed because of --remote-cache:
-			cluster, err := cmdOpts.ClusterProvider().Get(ctx, opts.DefaultedCluster(jetCfg))
+			cluster, err := cmdOpts.ClusterProvider().Get(ctx)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -95,7 +94,7 @@ func buildCmd() *cobra.Command {
 // registerBuildFlags is only called by the build command. One call site.
 func registerBuildFlags(cmd *cobra.Command, opts *buildOptions) {
 	registerEmbeddedBuildFlags(cmd, &opts.embeddedBuildOptions)
-	jflags.RegisterCommonFlags(cmd, &opts.Common)
+	jflags.RegisterCommonFlags(cmd, cmdOpts)
 }
 
 // registerEmbeddedBuildFlags is called by many commands: up, dev, build, local.

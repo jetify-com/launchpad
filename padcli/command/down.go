@@ -30,7 +30,7 @@ func downCmd() *cobra.Command {
 				return errors.WithStack(err)
 			}
 
-			c, err := RequireConfigFromFileSystem(ctx, cmd, args)
+			c, err := RequireConfigFromFileSystem(ctx, cmd, args, cmdOpts)
 			if errors.Is(err, jetconfig.ErrConfigNotFound) {
 				return errorutil.NewUserError(
 					"jetconfig not found. Please run `launchpad down` in launchpad project " +
@@ -65,7 +65,7 @@ func downCmd() *cobra.Command {
 		},
 	}
 
-	jflags.RegisterDownFlags(downCmd, flags)
+	jflags.RegisterDownFlags(downCmd, flags, cmdOpts)
 	return downCmd
 }
 
@@ -74,7 +74,7 @@ func makeLaunchpadDownOptions(
 	jetCfg *jetconfig.Config,
 	flags *jflags.DownCmd,
 ) (*launchpad.DownOptions, error) {
-	cluster, err := cmdOpts.ClusterProvider().Get(ctx, flags.DefaultedCluster(jetCfg))
+	cluster, err := cmdOpts.ClusterProvider().Get(ctx)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
