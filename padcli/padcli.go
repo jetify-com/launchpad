@@ -13,6 +13,8 @@ import (
 	"go.jetpack.io/launchpad/padcli/provider"
 )
 
+type CobraFunc func(cmd *cobra.Command, args []string) error
+
 type Padcli struct {
 	additionalCommands []*cobra.Command
 	analyticsProvider  provider.Analytics
@@ -21,8 +23,9 @@ type Padcli struct {
 	envSecProvider     provider.EnvSec
 	errorLogger        provider.ErrorLogger
 	hooks              *hook.Hooks
-	persistentPreRunE  func(cmd *cobra.Command, args []string) error
-	persistentPostRunE func(cmd *cobra.Command, args []string) error
+	initSurverProvider provider.InitSurveyProvider
+	persistentPreRunE  CobraFunc
+	persistentPostRunE CobraFunc
 	namespaceProvider  provider.NamespaceProvider
 	repositoryProvider provider.Repository
 	rootCommand        *cobra.Command
@@ -45,6 +48,11 @@ func New(opts ...padcliOption) *Padcli {
 	for _, opt := range opts {
 		opt(p)
 	}
+
+	if p.initSurverProvider == nil {
+		p.initSurverProvider = provider.DefaultInitSurveyProvider(p.clusterProvider)
+	}
+
 	return p
 }
 
@@ -74,6 +82,10 @@ func (p *Padcli) ErrorLogger() provider.ErrorLogger {
 
 func (p *Padcli) Hooks() *hook.Hooks {
 	return p.hooks
+}
+
+func (p *Padcli) InitSurveyProvider() provider.InitSurveyProvider {
+	return p.initSurverProvider
 }
 
 func (p *Padcli) NamespaceProvider() provider.NamespaceProvider {
@@ -160,19 +172,25 @@ func WithHooks(hooks *hook.Hooks) padcliOption {
 	}
 }
 
+func WithInitSurveyProvider(provider provider.InitSurveyProvider) padcliOption {
+	return func(p *Padcli) {
+		p.initSurverProvider = provider
+	}
+}
+
 func WithNamespaceProvider(ns provider.NamespaceProvider) padcliOption {
 	return func(p *Padcli) {
 		p.namespaceProvider = ns
 	}
 }
 
-func WithPersistentPreRunE(r func(cmd *cobra.Command, args []string) error) padcliOption {
+func WithPersistentPreRunE(r CobraFunc) padcliOption {
 	return func(p *Padcli) {
 		p.persistentPreRunE = r
 	}
 }
 
-func WithPersistentPostRunE(r func(cmd *cobra.Command, args []string) error) padcliOption {
+func WithPersistentPostRunE(r CobraFunc) padcliOption {
 	return func(p *Padcli) {
 		p.persistentPostRunE = r
 	}

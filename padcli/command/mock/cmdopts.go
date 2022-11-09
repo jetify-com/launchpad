@@ -52,6 +52,10 @@ func (*MockCmdOptions) Hooks() *hook.Hooks {
 	return hook.New()
 }
 
+func (*MockCmdOptions) InitSurveyProvider() provider.InitSurveyProvider {
+	return provider.DefaultInitSurveyProvider(&mockClusterProvider{})
+}
+
 func (*MockCmdOptions) RepositoryProvider() provider.Repository {
 	return provider.EmptyRepository()
 }
