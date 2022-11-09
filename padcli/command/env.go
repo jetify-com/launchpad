@@ -134,7 +134,6 @@ func newEnvStore(
 	selectedProvider string,
 ) (envsec.Store, error) {
 	storeConfig := &envsec.SSMConfig{}
-	var store envsec.Store
 
 	providedConfig, err := envSecProvider.Get(ctx, selectedProvider)
 	if err != nil {
@@ -142,7 +141,7 @@ func newEnvStore(
 	}
 	if providedConfig == nil && selectedProvider == "" {
 		// Skip envsec as the project is not setup with envsec.
-		return store, nil
+		return nil, nil
 	}
 
 	if providedConfig != nil {
@@ -155,7 +154,7 @@ func newEnvStore(
 		}
 	}
 
-	store, err = envsec.NewStore(ctx, storeConfig)
+	store, err := envsec.NewStore(ctx, storeConfig)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
