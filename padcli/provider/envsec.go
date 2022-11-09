@@ -8,7 +8,8 @@ import (
 )
 
 type EnvSec interface {
-	Get(context.Context) (EnvSecConfig, error)
+	// string here refers to "selected provider"
+	Get(context.Context, string) (EnvSecConfig, error)
 	NewEnvId(ctx context.Context, projectId string, env string) (*envsec.EnvId, error)
 }
 
@@ -27,7 +28,8 @@ func DefaultEnvSecProvider() EnvSec {
 	return &defaultEnvSec{}
 }
 
-func (p *defaultEnvSec) Get(ctx context.Context) (EnvSecConfig, error) {
+// Both "jetpack" and "" are valid as input for selectedProvider.
+func (p *defaultEnvSec) Get(ctx context.Context, selectedProvider string) (EnvSecConfig, error) {
 	return nil, nil
 }
 

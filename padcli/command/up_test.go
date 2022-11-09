@@ -109,7 +109,7 @@ func (t *Suite) TestBuildPublishAndDeploy() {
 	bo := &opts.embeddedBuildOptions
 	cluster := mock.NewClusterForTest(jetCfg.Cluster, true)
 
-	repoConfig, err := cmdOpts.RepositoryProvider().Get(ctx, cluster)
+	repoConfig, err := cmdOpts.RepositoryProvider().Get(ctx, cluster, "")
 	req.NoError(err)
 
 	_, err = buildPublishAndDeploy(
