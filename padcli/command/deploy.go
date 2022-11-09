@@ -93,7 +93,6 @@ func makeDeployOptions(
 		return nil, err
 	}
 
-	var runtimeHelm *launchpad.HelmOptions
 	runtimeValues, err := cmdOpts.Hooks().PostRuntimeChartValuesCompute(
 		ctx,
 		cmdOpts,
@@ -110,6 +109,8 @@ func makeDeployOptions(
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed merging --helm.runtime.set values")
 	}
+
+	var runtimeHelm *launchpad.HelmOptions
 	if len(runtimeValues) != 0 {
 		runtimeHelm = &launchpad.HelmOptions{
 			ChartLocation: opts.Runtime.ChartLocation,
