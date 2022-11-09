@@ -92,6 +92,7 @@ func makeDeployOptions(
 	if err != nil {
 		return nil, err
 	}
+
 	runtimeValues, err := cmdOpts.Hooks().PostRuntimeChartValuesCompute(
 		ctx,
 		cmdOpts,
@@ -99,6 +100,24 @@ func makeDeployOptions(
 	)
 	if err != nil {
 		return nil, err
+	}
+	runtimeValues, err = helm.MergeValues(
+		runtimeValues,
+		[]string{}, // values files
+		opts.Runtime.SetValues,
+	)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed merging --helm.runtime.set values")
+	}
+
+	var runtimeHelm *launchpad.HelmOptions
+	if len(runtimeValues) != 0 {
+		runtimeHelm = &launchpad.HelmOptions{
+			ChartLocation: opts.Runtime.ChartLocation,
+			Values:        runtimeValues,
+			// Not ideal, but better than failing. We need to fine tune.
+			Timeout: 5 * time.Minute,
+		}
 	}
 
 	// if --env-override flag was explicitly set, then add values to helmOptions
@@ -116,15 +135,6 @@ func makeDeployOptions(
 
 	if cmd.Flags().Changed(mountSecretFileFlag) && cmd.Flags().Changed(mountSecretFilesFlag) {
 		return nil, errors.Errorf("Incompatible command line opts '%v' and '%v' : Prefer specifying a list of secret files using '%v'", mountSecretFileFlag, mountSecretFilesFlag, mountSecretFilesFlag)
-	}
-
-	runtimeValues, err = helm.MergeValues(
-		runtimeValues,
-		[]string{}, // values files
-		opts.Runtime.SetValues,
-	)
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed merging --helm.runtime.set values")
 	}
 
 	appValues["secrets"] = appSecrets
@@ -153,20 +163,15 @@ func makeDeployOptions(
 			Values:        appValues,
 			Timeout:       lo.Ternary(len(jetCfg.Jobs()) > 0, 5*time.Minute, 0),
 		},
-		Environment:    cmdOpts.RootFlags().Env().String(),
-		ExternalCharts: jetconfigHelmToChartConfig(jetCfg, ns),
-		JetCfg:         jetCfg,
-		IsLocalCluster: cluster.IsLocal(),
-		KubeContext:    cluster.GetKubeContext(),
-		LifecycleHook:  cmdOpts.Hooks().Deploy,
-		Namespace:      ns,
-		RemoteEnvVars:  remoteEnvVars,
-		Runtime: &launchpad.HelmOptions{
-			ChartLocation: opts.Runtime.ChartLocation,
-			Values:        runtimeValues,
-			// Not ideal, but better than failing. We need to fine tune.
-			Timeout: 5 * time.Minute,
-		},
+		Environment:                 cmdOpts.RootFlags().Env().String(),
+		ExternalCharts:              jetconfigHelmToChartConfig(jetCfg, ns),
+		JetCfg:                      jetCfg,
+		IsLocalCluster:              cluster.IsLocal(),
+		KubeContext:                 cluster.GetKubeContext(),
+		LifecycleHook:               cmdOpts.Hooks().Deploy,
+		Namespace:                   ns,
+		RemoteEnvVars:               remoteEnvVars,
+		Runtime:                     runtimeHelm,
 		SecretFilePaths:             opts.SecretFilePaths,
 		ReinstallOnHelmUpgradeError: opts.ReinstallOnHelmUpgradeError,
 	}, nil
