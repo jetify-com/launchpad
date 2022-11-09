@@ -63,7 +63,7 @@ func buildCmd() *cobra.Command {
 				return errors.WithStack(err)
 			}
 
-			repoConfig, err := cmdOpts.RepositoryProvider().Get(ctx, cluster)
+			repoConfig, err := cmdOpts.RepositoryProvider().Get(ctx, cluster, "")
 			if err != nil {
 				return errors.WithStack(err)
 			}

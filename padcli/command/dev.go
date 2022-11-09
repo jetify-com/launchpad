@@ -159,12 +159,13 @@ func autoDeploy(
 			return errors.WithStack(err)
 		}
 
-		repoConfig, err := cmdOpts.RepositoryProvider().Get(ctx, cluster)
+		imageRepo := goutil.Coalesce(opts.ImageRepo, jetCfg.ImageRepository)
+		repoConfig, err := cmdOpts.RepositoryProvider().Get(ctx, cluster, imageRepo)
 		if err != nil {
 			return errors.WithStack(err)
 		}
 
-		store, err := newEnvStore(ctx, cmd, cmdArgs, cmdOpts.EnvSecProvider())
+		store, err := newEnvStore(ctx, cmd, cmdArgs, cmdOpts.EnvSecProvider(), jetCfg.Envsec.Provider)
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -176,7 +177,7 @@ func autoDeploy(
 			jetCfg,
 			&opts.embeddedBuildOptions,
 			&opts.deployOptions,
-			goutil.Coalesce(opts.ImageRepo, jetCfg.ImageRepository),
+			imageRepo,
 			absPath,
 			cluster,
 			repoConfig,

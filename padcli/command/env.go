@@ -48,7 +48,7 @@ func envCmd() *cobra.Command {
 				return errors.WithStack(err)
 			}
 
-			c, err := RequireConfigFromFileSystem(ctx, cmd, []string{absProjectPath}, cmdOpts)
+			jetCfg, err := RequireConfigFromFileSystem(ctx, cmd, []string{absProjectPath}, cmdOpts)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -56,7 +56,7 @@ func envCmd() *cobra.Command {
 			// Construct the envId:
 			envId, err := cmdOpts.EnvSecProvider().NewEnvId(
 				ctx,
-				c.GetProjectID(),
+				jetCfg.GetProjectID(),
 				cmdOpts.RootFlags().Env().String(),
 			)
 			if err != nil {
@@ -67,7 +67,7 @@ func envCmd() *cobra.Command {
 			}
 			cmdCfg.EnvId = *envId
 
-			store, err := newEnvStore(ctx, cmd, args, cmdOpts.EnvSecProvider())
+			store, err := newEnvStore(ctx, cmd, args, cmdOpts.EnvSecProvider(), jetCfg.Envsec.Provider)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -131,13 +131,19 @@ func newEnvStore(
 	cmd *cobra.Command,
 	args []string,
 	envSecProvider provider.EnvSec,
+	selectedProvider string,
 ) (envsec.Store, error) {
 	storeConfig := &envsec.SSMConfig{}
 
-	providedConfig, err := envSecProvider.Get(ctx)
+	providedConfig, err := envSecProvider.Get(ctx, selectedProvider)
 	if err != nil {
 		return nil, err
 	}
+	if providedConfig == nil && selectedProvider == "" {
+		// Skip envsec as the project is not setup with envsec.
+		return nil, nil
+	}
+
 	if providedConfig != nil {
 		storeConfig = &envsec.SSMConfig{
 			Region:          providedConfig.GetRegion(),
