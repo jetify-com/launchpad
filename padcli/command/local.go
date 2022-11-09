@@ -26,17 +26,17 @@ func localCmd() *cobra.Command {
 		Args:   cobra.MaximumNArgs(1),
 		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, err := cmdOpts.AuthProvider().Identify(cmd.Context())
-			if err != nil {
-				return errors.WithStack(err)
-			}
-
 			absPath, err := projectDir(args)
 			if err != nil {
 				return errors.WithStack(err)
 			}
 
-			jetCfg, err := loadOrInitConfigFromFileSystem(ctx, cmd, args)
+			jetCfg, err := loadOrInitConfigFromFileSystem(cmd.Context(), cmd, args)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+
+			ctx, err := cmdOpts.AuthProvider().Identify(cmd.Context())
 			if err != nil {
 				return errors.WithStack(err)
 			}
