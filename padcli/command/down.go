@@ -25,18 +25,17 @@ func downCmd() *cobra.Command {
 			"associated resources.",
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, err := cmdOpts.AuthProvider().Identify(cmd.Context())
-			if err != nil {
-				return errors.WithStack(err)
-			}
-
-			c, err := RequireConfigFromFileSystem(ctx, cmd, args, cmdOpts)
+			c, err := RequireConfigFromFileSystem(cmd.Context(), cmd, args, cmdOpts)
 			if errors.Is(err, jetconfig.ErrConfigNotFound) {
 				return errorutil.NewUserError(
 					"jetconfig not found. Please run `launchpad down` in launchpad project " +
 						"directory or pass path to directory as parameter.",
 				)
 			} else if err != nil {
+				return errors.WithStack(err)
+			}
+			ctx, err := cmdOpts.AuthProvider().Identify(cmd.Context())
+			if err != nil {
 				return errors.WithStack(err)
 			}
 			do, err := makeLaunchpadDownOptions(ctx, c, flags)
