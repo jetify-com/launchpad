@@ -33,12 +33,8 @@ func envCmd() *cobra.Command {
 			store values that contain passwords and other secrets.
 		`),
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			ctx, err := cmdOpts.AuthProvider().Identify(cmd.Context())
-			if err != nil {
-				return errors.WithStack(err)
-			}
-
-			absProjectPath := ""
+			var absProjectPath string
+			var err error
 			if opts.projectConfigPath == "" {
 				absProjectPath, err = getProjectDir()
 			} else {
@@ -48,7 +44,12 @@ func envCmd() *cobra.Command {
 				return errors.WithStack(err)
 			}
 
-			jetCfg, err := RequireConfigFromFileSystem(ctx, cmd, []string{absProjectPath}, cmdOpts)
+			jetCfg, err := RequireConfigFromFileSystem(cmd.Context(), cmd, []string{absProjectPath}, cmdOpts)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+
+			ctx, err := cmdOpts.AuthProvider().Identify(cmd.Context())
 			if err != nil {
 				return errors.WithStack(err)
 			}

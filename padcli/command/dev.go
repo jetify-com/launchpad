@@ -41,15 +41,21 @@ func devCmd() *cobra.Command {
 		Hidden:  true,
 		PreRunE: validateDeployUptions(&opts.deployOptions),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			absPath, err := projectDir(args)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+
+			_, err = loadOrInitConfigFromFileSystem(cmd.Context(), cmd, args)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+
 			ctx, err := cmdOpts.AuthProvider().Identify(cmd.Context())
 			if err != nil {
 				return errors.WithStack(err)
 			}
 
-			absPath, err := projectDir(args)
-			if err != nil {
-				return errors.WithStack(err)
-			}
 			fsChanges, err := listenToFilesystemChanges(ctx, absPath)
 			if err != nil {
 				return errors.Wrap(err, "failed to listen to filesystem changes")
