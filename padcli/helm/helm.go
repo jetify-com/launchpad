@@ -63,6 +63,10 @@ func (hvc *ValueComputer) RuntimeValues() map[string]any {
 	return hvc.runtimeValues
 }
 
+func (hvc *ValueComputer) ImageProvider() *ImageProvider {
+	return hvc.imageProvider
+}
+
 // Compute converts command options to helm values.
 func (hvc *ValueComputer) Compute(ctx context.Context) error {
 	hvc.appValues = map[string]any{}

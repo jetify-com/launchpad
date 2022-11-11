@@ -63,6 +63,7 @@ func makeDeployOptions(
 		helm.NewImageProvider(
 			buildOutput.Image.String(),
 			publishOutput.PublishedImages(),
+			string(publishOutput.RegistryHost),
 		),
 		jetCfg,
 		cluster,
@@ -83,7 +84,6 @@ func makeDeployOptions(
 	if err := hvc.Compute(ctx); err != nil {
 		return nil, errors.Wrap(err, "failed to compute helm values")
 	}
-
 	appValues, err := cmdOpts.Hooks().PostAppChartValuesCompute(
 		ctx,
 		cmdOpts,
@@ -92,7 +92,6 @@ func makeDeployOptions(
 	if err != nil {
 		return nil, err
 	}
-
 	runtimeValues, err := cmdOpts.Hooks().PostRuntimeChartValuesCompute(
 		ctx,
 		cmdOpts,
