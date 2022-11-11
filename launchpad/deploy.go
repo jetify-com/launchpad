@@ -59,7 +59,8 @@ type DeployOptions struct {
 
 	LifecycleHook hook.LifecycleHook
 
-	Namespace string
+	Namespace       string
+	CreateNamespace bool
 
 	RemoteEnvVars map[string]string
 	Runtime       *HelmOptions
