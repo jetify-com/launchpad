@@ -114,6 +114,7 @@ type PublishPlan struct {
 
 type PublishOutput struct {
 	Duration        time.Duration
+	RegistryHost    registryHost
 	publishedImages map[string]string
 }
 
@@ -127,6 +128,10 @@ func (p *PublishImagePlan) remoteImageNameWithTag() string {
 
 func (p *PublishImagePlan) remoteImageNameWithLatestTag() string {
 	return fmt.Sprintf("%s:%s", p.remoteImageName, "latest")
+}
+
+func (ir *ImageRegistry) GetHost() registryHost {
+	return ir.host
 }
 
 func (o *PublishOutput) DidPublish() bool {
@@ -472,7 +477,10 @@ func (p *Pad) publishDockerImage(
 		published[image.localImage.String()] = image.remoteImageNameWithTag()
 	}
 
-	return &PublishOutput{publishedImages: published}, nil
+	return &PublishOutput{
+		publishedImages: published,
+		RegistryHost:    plan.registry.GetHost(),
+	}, nil
 }
 
 func makePublishPlan(

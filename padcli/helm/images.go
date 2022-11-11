@@ -10,6 +10,8 @@ type ImageProvider struct {
 	// Should include tag if it exists
 	defaultLocalImage string
 
+	imageRegistryHost string
+
 	// For published images, key is local image, value is published image
 	imagePublishMap map[string]string
 }
@@ -17,11 +19,17 @@ type ImageProvider struct {
 func NewImageProvider(
 	defaultLocalImage string,
 	imagePublishMap map[string]string,
+	imageRegistryHost string,
 ) *ImageProvider {
 	return &ImageProvider{
 		defaultLocalImage: defaultLocalImage,
 		imagePublishMap:   imagePublishMap,
+		imageRegistryHost: imageRegistryHost,
 	}
+}
+
+func (i *ImageProvider) GetRegistryHost() string {
+	return i.imageRegistryHost
 }
 
 func (i *ImageProvider) get(c provider.Cluster, img string) string {
