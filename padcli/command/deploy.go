@@ -162,6 +162,7 @@ func makeDeployOptions(
 			Values:        appValues,
 			Timeout:       lo.Ternary(len(jetCfg.Jobs()) > 0, 5*time.Minute, 0),
 		},
+		CreateNamespace:             !cluster.IsJetpackManaged(),
 		Environment:                 cmdOpts.RootFlags().Env().String(),
 		ExternalCharts:              jetconfigHelmToChartConfig(jetCfg, ns),
 		JetCfg:                      jetCfg,

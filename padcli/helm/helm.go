@@ -13,15 +13,6 @@ import (
 	"go.jetpack.io/launchpad/proto/api"
 )
 
-// type cluster interface {
-// 	GetHostname() string
-// 	GetIsPrivate() bool
-// 	GetName() string
-// 	IsLocal() bool
-// 	IsJetpackManaged() bool
-// 	IsRemoteUnmanaged() bool
-// }
-
 // ValueComputer transforms jetpack CLI inputs into helm values.
 // Right now we mostly copy paste the logic, but the idea is to have individual
 // modules that compute sections of the values. e.g. ambassadorModule, cronjobModule, etc.

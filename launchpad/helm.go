@@ -42,6 +42,7 @@ func applyHelmCharts(
 		return nil, errorutil.CombinedError(err, errUnableToAccessHelmReleases)
 	}
 
+	createNamespace := plan.DeployOptions.CreateNamespace
 	for _, cc := range plan.Charts() {
 		c, err := actionConfig(ctx, plan.helmDriver, cc.Namespace, settings)
 		if err != nil {
@@ -53,7 +54,7 @@ func applyHelmCharts(
 			releases[cc.Name], err = upgradeHelmChart(ctx, cc, settings, c)
 
 			if plan.DeployOptions.ReinstallOnHelmUpgradeError {
-				releases[cc.Name], err = reinstallHelmChart(ctx, cc.Release, cc, settings, c)
+				releases[cc.Name], err = reinstallHelmChart(ctx, cc.Release, cc, settings, c, createNamespace)
 				if err != nil {
 					return nil, errors.WithStack(err)
 				}
@@ -71,12 +72,12 @@ func applyHelmCharts(
 				// We will automatically down the old release and up a new release.
 				// Since the old release is using app name as the release name.
 				jetlog.Logger(ctx).IndentedPrintln("Detected old install by the project name. Changing to install by project ID.")
-				releases[cc.Name], err = reinstallHelmChart(ctx, cc.instanceName, cc, settings, c)
+				releases[cc.Name], err = reinstallHelmChart(ctx, cc.instanceName, cc, settings, c, createNamespace)
 				if err != nil {
 					return nil, errors.WithStack(err)
 				}
 			} else {
-				releases[cc.Name], err = installHelmChart(ctx, cc, settings, c)
+				releases[cc.Name], err = installHelmChart(ctx, cc, settings, c, createNamespace)
 				if err != nil {
 					return releases, errors.Wrap(err, "Error installing helm chart")
 				}
@@ -96,7 +97,7 @@ func applyHelmCharts(
 				return nil, err
 			}
 		} else {
-			_, err = installHelmChart(ctx, chart, settings, c)
+			_, err = installHelmChart(ctx, chart, settings, c, createNamespace)
 			if err != nil {
 				return nil, err
 			}
@@ -111,6 +112,7 @@ func installHelmChart(
 	cc *ChartConfig,
 	settings *cli.EnvSettings,
 	config *action.Configuration,
+	createNamespace bool,
 ) (*release.Release, error) {
 	install := action.NewInstall(config)
 
@@ -123,6 +125,7 @@ func installHelmChart(
 	install.ReleaseName = cc.Release
 	// For Jetpack-managed clusters, namespace is created (and permissions are set) by InitNamespace. And we
 	// cannot set --create-namespace=true because multi-tenant cluster users won't have permissions.
+	install.CreateNamespace = createNamespace
 
 	install.Wait = cc.Wait
 	install.Timeout = cc.Timeout
@@ -376,6 +379,7 @@ func reinstallHelmChart(
 	cc *ChartConfig,
 	settings *cli.EnvSettings,
 	config *action.Configuration,
+	createNamespace bool,
 ) (*release.Release, error) {
 	jetlog.Logger(ctx).BoldPrintf("Could not upgrade. Reinstalling...\n")
 	uninstall := action.NewUninstall(config)
@@ -384,5 +388,5 @@ func reinstallHelmChart(
 	if err != nil {
 		return nil, errorutil.CombinedError(err, errUserReinstallFail)
 	}
-	return installHelmChart(ctx, cc, settings, config)
+	return installHelmChart(ctx, cc, settings, config, createNamespace)
 }
