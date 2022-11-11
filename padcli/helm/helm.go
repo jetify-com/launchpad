@@ -176,16 +176,11 @@ func (hvc *ValueComputer) Compute(ctx context.Context) error {
 }
 
 func (hvc *ValueComputer) ComputeHostname(ctx context.Context) (string, error) {
-	appFragment := ""
-	// Hack so we don't break old Smarthop URLs.
-	if hvc.cluster.GetHostname() == "smarthop.jetpack.dev" {
-		appFragment = "-app"
-	}
 	websvc, err := hvc.jetCfg.WebService()
 	if err != nil {
 		return "", errors.WithStack(err)
 	}
-	hostname := websvc.GetName() + appFragment + "-" + hvc.namespace + "." + hvc.cluster.GetHostname()
+	hostname := websvc.GetName() + "-" + hvc.namespace + "." + hvc.cluster.GetHostname()
 	url, err := websvc.GetURL()
 	if err != nil {
 		return "", errors.Wrap(err, "unable to get web service url")
