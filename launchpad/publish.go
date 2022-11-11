@@ -59,9 +59,10 @@ const (
 )
 
 // Regex derived from https://github.com/aws/aws-sam-cli/blob/2592135cd21cb5fb1559e866cce2d5383ee49536/samcli/lib/package/regexpr.py
+// This matches private ecr repos and public one.
 var ecrURIRegex = regexp.MustCompile(
-	`(^[a-zA-Z0-9][a-zA-Z0-9-_]*)\.dkr\.ecr\.([a-zA-Z0-9][a-zA-Z0-9-_]*)\.amazonaws\.com(\.cn)?` +
-		`\/(?:[a-z0-9]+(?:[._-][a-z0-9]+)*\/)*[a-z0-9]+(?:[._-][a-z0-9]+)*`,
+	`((^[a-zA-Z0-9][a-zA-Z0-9-_]*)\.dkr\.ecr\.([a-zA-Z0-9][a-zA-Z0-9-_]*)\.amazonaws\.com(\.cn)?` +
+		`\/(?:[a-z0-9]+(?:[._-][a-z0-9]+)*\/)*[a-z0-9]+(?:[._-][a-z0-9]+)*)|public\.ecr\.aws\/.*`,
 )
 
 // Regex based on https://cloud.google.com/artifact-registry/docs/docker/names
