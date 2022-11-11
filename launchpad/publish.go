@@ -114,7 +114,7 @@ type PublishPlan struct {
 
 type PublishOutput struct {
 	Duration        time.Duration
-	RegistryHost    registryHost
+	registryHost    registryHost
 	publishedImages map[string]string
 }
 
@@ -152,6 +152,13 @@ func (do *PublishOutput) SetDuration(d time.Duration) {
 	if do != nil {
 		do.Duration = d
 	}
+}
+
+func (o *PublishOutput) RegistryHost() string {
+	if o == nil {
+		return ""
+	}
+	return string(o.registryHost)
 }
 
 func getRemoteRegistryInfo(
@@ -479,7 +486,7 @@ func (p *Pad) publishDockerImage(
 
 	return &PublishOutput{
 		publishedImages: published,
-		RegistryHost:    plan.registry.GetHost(),
+		registryHost:    plan.registry.GetHost(),
 	}, nil
 }
 

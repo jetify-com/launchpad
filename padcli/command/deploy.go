@@ -63,7 +63,7 @@ func makeDeployOptions(
 		helm.NewImageProvider(
 			buildOutput.Image.String(),
 			publishOutput.PublishedImages(),
-			string(publishOutput.RegistryHost),
+			publishOutput.RegistryHost(),
 		),
 		jetCfg,
 		cluster,
