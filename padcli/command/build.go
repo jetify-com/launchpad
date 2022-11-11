@@ -17,11 +17,6 @@ const (
 	localImageFlag = "local-image"
 )
 
-const (
-	imageRepositoryFlagHelpMsg = "Image repository to push the built image to. " +
-		"Your kubernetes cluster must have the permissions to pull images from this repository."
-)
-
 type embeddedBuildOptions struct {
 	Platform    string
 	BuildArgs   map[string]string

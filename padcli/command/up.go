@@ -155,7 +155,7 @@ func registerPublishFlags(cmd *cobra.Command, opts *publishOptions) {
 		"image-repository",
 		"i",
 		"",
-		imageRepositoryFlagHelpMsg,
+		provider.ImageRepositoryFlagHelpMsg,
 	)
 }
 

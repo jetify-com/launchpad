@@ -7,6 +7,7 @@ type Providers interface {
 	ClusterProvider() ClusterProvider
 	EnvSecProvider() EnvSec
 	ErrorLogger() ErrorLogger
+	InitSurveyProvider() InitSurveyProvider
 	NamespaceProvider() NamespaceProvider
 	RepositoryProvider() Repository
 }
