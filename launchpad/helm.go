@@ -121,9 +121,9 @@ func installHelmChart(
 
 	install.Namespace = cc.Namespace
 	install.ReleaseName = cc.Release
-	// For Jetpack-managed clusters, namespace is created (and permissions are set) by InitNamespace. And we
-	// cannot set --create-namespace=true because multi-tenant cluster users won't have permissions.
-
+	// For Jetpack-managed clusters, namespace is created (and permissions are set) by InitNamespace, so this
+	// will be a no-op. For other clusters, we set to true in case the namespace doesn't exist yet.
+	install.CreateNamespace = true
 	install.Wait = cc.Wait
 	install.Timeout = cc.Timeout
 
