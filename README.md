@@ -113,6 +113,8 @@ In this quickstart, we’ll deploy a cron job to your local Docker Desktop Kuber
 
 `launchpad env` - use launchpad's secret management toolchain
 
+`launchpad cluster` - use launchpad's cluster management toolchain
+
 See the [CLI Reference](https://www.jetpack.io/launchpad/docs/reference/cli/) for the full list of commands.
 
 
