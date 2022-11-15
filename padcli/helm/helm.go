@@ -13,15 +13,6 @@ import (
 	"go.jetpack.io/launchpad/proto/api"
 )
 
-// type cluster interface {
-// 	GetHostname() string
-// 	GetIsPrivate() bool
-// 	GetName() string
-// 	IsLocal() bool
-// 	IsJetpackManaged() bool
-// 	IsRemoteUnmanaged() bool
-// }
-
 // ValueComputer transforms jetpack CLI inputs into helm values.
 // Right now we mostly copy paste the logic, but the idea is to have individual
 // modules that compute sections of the values. e.g. ambassadorModule, cronjobModule, etc.
@@ -31,6 +22,7 @@ type ValueComputer struct {
 
 	env                 api.Environment
 	namespace           string // The final namespace to be used
+	createNamespace     bool   // Value used for helm's --create-namespace
 	execQualifiedSymbol string // Used by jetpack dev <path/to/project> --exec <symbol>
 	imageProvider       *ImageProvider
 	jetCfg              *jetconfig.Config // consider interface
@@ -215,6 +207,14 @@ func (hvc *ValueComputer) Environment() api.Environment {
 
 func (hvc *ValueComputer) Namespace() string {
 	return hvc.namespace
+}
+
+func (hvc *ValueComputer) CreateNamespace() bool {
+	return hvc.createNamespace
+}
+
+func (hvc *ValueComputer) SetCreateNamespace(createNamespace bool) {
+	hvc.createNamespace = createNamespace
 }
 
 func (hvc *ValueComputer) Cluster() provider.Cluster {
