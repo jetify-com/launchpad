@@ -111,9 +111,13 @@ In this quickstart, we’ll deploy a cron job to your local Docker Desktop Kuber
 
 `launchpad help` - see all commands
 
-`launchpad env` - use launchpad's secret management toolchain
+`launchpad auth` - use launchpad's authentication toolchain (user account required)
 
-`launchpad cluster` - use launchpad's cluster management toolchain
+`launchpad env` - use launchpad's secret management toolchain (user account required)
+
+`launchpad cluster` - use launchpad's cluster management toolchain (user account required)
+
+Note: all "user account required" commands are excluded from the open-source repository. These special commands are added on top of the open-source codebase for you. They are available in the launchpad CLI.
 
 See the [CLI Reference](https://www.jetpack.io/launchpad/docs/reference/cli/) for the full list of commands.
 
@@ -126,4 +130,4 @@ See the [CLI Reference](https://www.jetpack.io/launchpad/docs/reference/cli/) fo
 
 ## Contributing
 
-Launchpad is an opensource project so contributions are always welcome. Please read [our contributing guide](CONTRIBUTING.md) before submitting pull requests.
+Launchpad is an open-core project so contributions are always welcome. Please read [our contributing guide](CONTRIBUTING.md) before submitting pull requests.
