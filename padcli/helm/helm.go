@@ -22,6 +22,7 @@ type ValueComputer struct {
 
 	env                 api.Environment
 	namespace           string // The final namespace to be used
+	createNamespace     bool   // Value used for helm's --create-namespace
 	execQualifiedSymbol string // Used by jetpack dev <path/to/project> --exec <symbol>
 	imageProvider       *ImageProvider
 	jetCfg              *jetconfig.Config // consider interface
@@ -206,6 +207,14 @@ func (hvc *ValueComputer) Environment() api.Environment {
 
 func (hvc *ValueComputer) Namespace() string {
 	return hvc.namespace
+}
+
+func (hvc *ValueComputer) CreateNamespace() bool {
+	return hvc.createNamespace
+}
+
+func (hvc *ValueComputer) SetCreateNamespace(createNamespace bool) {
+	hvc.createNamespace = createNamespace
 }
 
 func (hvc *ValueComputer) Cluster() provider.Cluster {
