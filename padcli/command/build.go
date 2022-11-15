@@ -118,6 +118,7 @@ func registerEmbeddedBuildFlags(cmd *cobra.Command, opts *embeddedBuildOptions) 
 			"adds BUILDKIT_INLINE_CACHE=1 build arg to save cache metadata and also "+
 			"sets the cache-from docker build option",
 	)
+	_ = cmd.Flags().MarkHidden("remote-cache")
 
 	cmd.Flags().StringVar(
 		&opts.LocalImage,

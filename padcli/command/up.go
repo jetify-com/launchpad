@@ -181,12 +181,15 @@ func registerDeployFlags(cmd *cobra.Command, opts *deployOptions) {
 		"",
 		"custom location for app chart",
 	)
+	_ = cmd.Flags().MarkHidden("helm.app.chart-location")
+
 	cmd.Flags().StringVar(
 		&opts.App.Name,
 		"helm.app.name",
 		"",
 		"App install name",
 	)
+	_ = cmd.Flags().MarkHidden("helm.app.name")
 
 	cmd.Flags().StringVar(
 		&opts.Runtime.SetValues,
@@ -194,12 +197,15 @@ func registerDeployFlags(cmd *cobra.Command, opts *deployOptions) {
 		"",
 		"args passed to helm --set option for runtime (can specify multiple or separate values with commas: key1=val1,key2=val2)",
 	)
+	_ = cmd.Flags().MarkHidden("helm.runtime.set")
+
 	cmd.Flags().StringVar(
 		&opts.Runtime.ChartLocation,
 		"helm.runtime.chart-location",
 		"",
 		"custom location for runtime chart",
 	)
+	_ = cmd.Flags().MarkHidden("helm.runtime.chart-location")
 
 	cmd.Flags().StringVarP(
 		&opts.Namespace,
@@ -251,9 +257,6 @@ func registerDeployFlags(cmd *cobra.Command, opts *deployOptions) {
 		"",
 		envOverrideFlagMsg,
 	)
-	// Made env-override file flag hidden temporarily until we decide on concrete approach
-	// on whether override merges with launchpad env or skips it
-	_ = cmd.Flags().MarkHidden(envOverrideFlag)
 
 	cmd.Flags().StringVar(
 		&opts.execQualifiedSymbol,
@@ -261,6 +264,7 @@ func registerDeployFlags(cmd *cobra.Command, opts *deployOptions) {
 		"",
 		"Execute a single cronjob or jetroutine for a given function.",
 	)
+	_ = cmd.Flags().MarkHidden("exec")
 
 	cmd.Flags().BoolVar(
 		&opts.ReinstallOnHelmUpgradeError,
