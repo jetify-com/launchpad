@@ -15,12 +15,7 @@ import (
 	"go.jetpack.io/launchpad/pkg/jetlog"
 )
 
-type envOptions struct {
-	projectConfigPath string
-}
-
 func envCmd() *cobra.Command {
-	opts := &envOptions{}
 	cmdCfg := &envcli.CmdConfig{}
 	command := &cobra.Command{
 		Use:   "env",
@@ -31,15 +26,12 @@ func envCmd() *cobra.Command {
 			Securely stores and retrieves environment variables on the cloud.
 			Environment variables are always encrypted, which makes it possible to
 			store values that contain passwords and other secrets.
+
+			This command can only be run within a Launchpad project's directory (the directory
+			where launchpad.yaml is present)
 		`),
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			var absProjectPath string
-			var err error
-			if opts.projectConfigPath == "" {
-				absProjectPath, err = getProjectDir()
-			} else {
-				absProjectPath, err = absPath([]string{opts.projectConfigPath})
-			}
+			absProjectPath, err := getProjectDir()
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -79,14 +71,6 @@ func envCmd() *cobra.Command {
 			return errors.WithStack(cmd.Help())
 		},
 	}
-
-	command.PersistentFlags().StringVarP(
-		&opts.projectConfigPath,
-		"project",
-		"p",
-		"",
-		"Path to project config. If directory, we assume name is launchpad.yaml",
-	)
 
 	command.AddCommand(
 		envcli.SetCmd(cmdCfg),
