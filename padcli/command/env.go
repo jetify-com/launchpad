@@ -31,6 +31,12 @@ func envCmd() *cobra.Command {
 			where launchpad.yaml is present)
 		`),
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if cmd.CalledAs() == "env" {
+				// Do not enforce being a project dir; instead let it through so the user
+				// can se the help text.
+				return nil
+			}
+
 			absProjectPath, err := getProjectDir()
 			if err != nil {
 				return errors.WithStack(err)
