@@ -21,21 +21,25 @@ The example below initializes a web project with `launchpad init`, and deploys t
 
 ## Benefits
 
-### Build publish and deploy with a single command
+### Build, Publish, and Deploy with a single command
 
-Launchpad can build any image, publish it to your Docker registry, and deploy it to Kubernetes in one step.
+Launchpad builds any image, publishes it to your Docker Registry, and deploys it to Kubernetes in one step. No need to manually build and push your image, setup your kube-context, or write long pages of Kubernetes YAML.
 
-### A consistent deployment setup per project
 
-Launchpad defines your project's Kubernetes configuration. Whether you are deploying in development, staging, or production environment, whether you are deploying to a local or remote Kubernetes cluster, Launchpad always creates the same set of Kubernetes resources for you each time.
+### A Heroku-like exprience on your own Kubernetes cluster
 
-### Easy onboarding for everyone on the team
+Ever wonder how you'd graduate from Heroku or a single EC2 machine to Kubernetes without going through a painful setup again? Faint not! With Launchpad, no manual migrations are required. In fact, developers can deploy and run their applications without needing to learn Kubernetes. 
 
-Launchpad gives each developer on your team a dedicated namespace to work on and deploy to and generates unique preview URLs for easy testing.
+
+### With Mission Control, onboarding new members is as easy as "launchpad up"
+
+Adding a new member to the team? Forget about Registry access, Cluster credentials, Kubernetes configurations, Namespace permissions, and a million other things to take care of. With Jetpack's Mission Control, Launchpad can automatically create all of the above for each new developer.
+
 
 ### Secret management built-in
 
 Secrets are tied to your launchpad projects, so they can be shared and updated securely by your team.
+
 
 ## Installing Launchpad
 
@@ -111,13 +115,13 @@ In this quickstart, we’ll deploy a cron job to your local Docker Desktop Kuber
 
 `launchpad help` - see all commands
 
-`launchpad auth` - use launchpad's authentication toolchain (user account required)
+`launchpad auth` - use launchpad's authentication toolchain (login required)
 
-`launchpad env` - use launchpad's secret management toolchain (user account required)
+`launchpad env` - use launchpad's secret management toolchain (login required)
 
-`launchpad cluster` - use launchpad's cluster management toolchain (user account required)
+`launchpad cluster` - use launchpad's cluster management toolchain (login required)
 
-Note: all "user account required" commands are excluded from the open-source repository. These special commands are added on top of the open-source codebase for you. They are available in the launchpad CLI.
+All "login required" commands require you to have an account with Jetpack's Mission Control offering. These special commands are added on top of the open-source codebase for you. Even though they are excluded from this repository, they are readily available in the launchpad CLI.
 
 See the [CLI Reference](https://www.jetpack.io/launchpad/docs/reference/cli/) for the full list of commands.
 
