@@ -21,14 +21,14 @@ The example below initializes a web project with `launchpad init`, and deploys t
 
 ## Benefits
 
-### Build, publish, and deploy with a single command
+### Build, Publish, and Deploy with a single command
 
 No need to remember which container image you uploaded to where, and what kube-context to use, Launchpad can build any image, publish it to your Docker registry, and deploy it to Kubernetes in one step.
 
 
 ### A Heroku-like experience, except on your Kubernetes cluster
 
-Ever wonder how you'd graduate from Heroku or a single EC2 machine to Kubernetes without going through a painful setup again? Faint not! With Launchpad, no manual migrations are required. In fact, you might do just fine without knowing Kubernetes at all.
+Ever wonder how you'd graduate from Heroku or a single EC2 machine to Kubernetes without going through a painful setup again? Faint not! With Launchpad, no manual migrations are required. In fact, your developers can deploy and run their applications without needing to learn Kubernetes. 
 
 
 ### With Mission Control, onboarding new members is as easy as "launchpad up"
