@@ -20,8 +20,8 @@ func downCmd() *cobra.Command {
 
 	downCmd := &cobra.Command{
 		Use:   "down",
-		Short: "uninstalls the app",
-		Long: "uninstalls the app. Uses helm uninstall to remove the app and " +
+		Short: "Uninstalls the app",
+		Long: "Uninstalls the app. Uses helm uninstall to remove the app and " +
 			"associated resources.",
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

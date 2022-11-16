@@ -17,7 +17,7 @@ var UnrecognizedCommandFlagError = errors.New("unrecognized command flag")
 func configCmd() *cobra.Command {
 	configCmd := &cobra.Command{
 		Use:   "config",
-		Short: "commands to operate on a project's jetconfig",
+		Short: "Commands to operate on a project's config",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()
 		},
@@ -25,8 +25,8 @@ func configCmd() *cobra.Command {
 
 	upgradeCmd := &cobra.Command{
 		Use:   "upgrade [path]",
-		Short: "upgrades a project's launchpad.yaml to follow the latest schema",
-		Long: "upgrades a project's launchpad.yaml to follow the latest schema found " +
+		Short: "Upgrades a project's launchpad.yaml to follow the latest schema",
+		Long: "Upgrades a project's launchpad.yaml to follow the latest schema found " +
 			"at https://www.jetpack.io/launchpad/docs/reference/launchpad.yaml-reference/",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
