@@ -33,7 +33,7 @@ Ever wonder how you'd graduate from Heroku or a single EC2 machine to Kubernetes
 
 ### With Mission Control, onboarding new members is as easy as "launchpad up"
 
-Adding a new member to the team? Forget about Registry access, Cluster credentials, Kubernetes configurations, Namespace permissions, and a million other things to take care of. With Mission Control, Launchpad automatically creates all of the above for each new developer.
+Adding a new member to the team? Forget about Registry access, Cluster credentials, Kubernetes configurations, Namespace permissions, and a million other things to take care of. With Jetpack's Mission Control, Launchpad can automatically create all of the above for each new developer.
 
 
 ### Secret management built-in
