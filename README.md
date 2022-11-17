@@ -21,7 +21,7 @@ The example below initializes a web project with `launchpad init`, and deploys t
 
 ## Benefits
 
-### A Zero DevOps workflow
+### All in one Kubernetes development workflow
 
 Launchpad builds any image, publishes it to your Docker Registry, and deploys it to Kubernetes in one step. No need to manually build and push your image, setup your kube-context, or write long pages of Kubernetes YAML.
 
