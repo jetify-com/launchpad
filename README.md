@@ -16,7 +16,7 @@ In practice, Launchpad works similar to Heroku or Vercel, except everything is o
 
 The example below initializes a web project with `launchpad init`, and deploys to a local Kubernetes cluster with `launchpad up`:
 
-![screen cast](https://user-images.githubusercontent.com/2292093/201768560-b8a4db24-49c4-45cc-a4a4-b27c2815835e.svg)
+![screen cast](https://www.jetpack.io/assets/image/launchpad-docker-desktop-k.svg)
 
 
 ## Benefits
