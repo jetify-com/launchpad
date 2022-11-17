@@ -121,7 +121,7 @@ In this quickstart, we’ll deploy a cron job to your local Docker Desktop Kuber
 
 `launchpad cluster` - create a cluster, list your clusters (login required)
 
-All "login required" commands require you to have an account with Jetpack's Mission Control offering. These special commands are added on top of the open-source codebase for you. Even though they are excluded from this repository, they are readily available in the launchpad CLI.
+All "login required" commands require you to have an account with [Jetpack's Mission Control](https://www.jetpack.io/launchpad) offering. These special commands are added on top of the open-source codebase for you. Even though they are excluded from this repository, they are readily available in the launchpad CLI.
 
 See the [CLI Reference](https://www.jetpack.io/launchpad/docs/reference/cli/) for the full list of commands.
 
