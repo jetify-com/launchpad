@@ -60,11 +60,11 @@ Read more on the [Launchpad docs](http://www.jetpack.io/launchpad/docs/getting-s
 
 In this quickstart, we’ll deploy a cron job to your local Docker Desktop Kubernetes cluster.
 
-1. Open a terminal in a new empty folder called `app/`.
+1. Open a terminal in a new empty folder called `launchpad/`.
 
 2. Enable [Kubernetes on Docker Desktop](https://docs.docker.com/desktop/kubernetes/)
 
-3. Initialize Launchpad in `app/`:
+3. Initialize Launchpad in `launchpad/`:
 
    ```bash
    > launchpad init
@@ -109,6 +109,11 @@ In this quickstart, we’ll deploy a cron job to your local Docker Desktop Kuber
    ```
 
    [kubectl](https://www.jetpack.io/launchpad/docs/getting-started/any-image-to-k8s-5-min/#prerequisites), while not required, is a useful tool for inspecting and managing your deployments in Kubernetes.
+   
+7. Clean up:
+   ```bash
+   launchpad down
+   ```
 
 
 ## Additional commands
