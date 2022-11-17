@@ -1,6 +1,6 @@
 # Launchpad
 
-### A Zero DevOps workflow for building applications on Kubernetes
+### Build, Publish, and Deploy to Kubernetes with a single command
 
 [![Join Discord](https://img.shields.io/discord/903306922852245526?color=7389D8&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/agbskCJXk2) ![License: Apache 2.0](https://img.shields.io/github/license/jetpack-io/devbox) [![version](https://img.shields.io/github/v/release/jetpack-io/launchpad?color=green&label=version&sort=semver)](https://github.com/jetpack-io/launchpad/releases) [![tests](https://github.com/jetpack-io/launchpad/actions/workflows/release.yaml/badge.svg)](https://github.com/jetpack-io/launchpad/actions/workflows/release.yaml?branch=main)
 
@@ -16,12 +16,12 @@ In practice, Launchpad works similar to Heroku or Vercel, except everything is o
 
 The example below initializes a web project with `launchpad init`, and deploys to a local Kubernetes cluster with `launchpad up`:
 
-![screen cast](https://user-images.githubusercontent.com/2292093/201768560-b8a4db24-49c4-45cc-a4a4-b27c2815835e.svg)
+![screen cast](https://www.jetpack.io/assets/image/launchpad-docker-desktop-k.svg)
 
 
 ## Benefits
 
-### Build, Publish, and Deploy with a single command
+### A Zero DevOps workflow
 
 Launchpad builds any image, publishes it to your Docker Registry, and deploys it to Kubernetes in one step. No need to manually build and push your image, setup your kube-context, or write long pages of Kubernetes YAML.
 
@@ -115,13 +115,13 @@ In this quickstart, we’ll deploy a cron job to your local Docker Desktop Kuber
 
 `launchpad help` - see all commands
 
-`launchpad auth` - use launchpad's authentication toolchain (login required)
+`launchpad auth` - create a user, login, or logout (login required)
 
-`launchpad env` - use launchpad's secret management toolchain (login required)
+`launchpad env` - manage environment variables and secrets (login required)
 
-`launchpad cluster` - use launchpad's cluster management toolchain (login required)
+`launchpad cluster` - create a cluster, list your clusters (login required)
 
-All "login required" commands require you to have an account with Jetpack's Mission Control offering. These special commands are added on top of the open-source codebase for you. Even though they are excluded from this repository, they are readily available in the launchpad CLI.
+All "login required" commands require you to have an account with [Jetpack's Mission Control](https://www.jetpack.io/launchpad) offering. These special commands are added on top of the open-source codebase for you. Even though they are excluded from this repository, they are readily available in the launchpad CLI.
 
 See the [CLI Reference](https://www.jetpack.io/launchpad/docs/reference/cli/) for the full list of commands.
 
