@@ -1,13 +1,13 @@
 # Launchpad
 
-### Build, Publish, and Deploy to Kubernetes with a single command
+### From Code to Kubernetes in One Step
 
 [![Join Discord](https://img.shields.io/discord/903306922852245526?color=7389D8&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/agbskCJXk2) ![License: Apache 2.0](https://img.shields.io/github/license/jetpack-io/devbox) [![version](https://img.shields.io/github/v/release/jetpack-io/launchpad?color=green&label=version&sort=semver)](https://github.com/jetpack-io/launchpad/releases) [![tests](https://github.com/jetpack-io/launchpad/actions/workflows/release.yaml/badge.svg)](https://github.com/jetpack-io/launchpad/actions/workflows/release.yaml?branch=main)
 
 
 ## What is it?
 
-[Launchpad](https://www.jetpack.io/launchpad) is a command-line tool that lets you easily create applications on Kubernetes. You start by choosing the cluster you want to deploy to, and launchpad uses that definition to create a deployment just for your application.
+[Launchpad](https://www.jetpack.io/launchpad) is a command-line tool that lets you easily create applications on Kubernetes.
 
 In practice, Launchpad works similar to Heroku or Vercel, except everything is on Kubernetes.
 
@@ -21,7 +21,7 @@ The example below initializes a web project with `launchpad init`, and deploys t
 
 ## Benefits
 
-### A Zero DevOps workflow
+### A Zero Ops workflow
 
 Launchpad builds any image, publishes it to your Docker Registry, and deploys it to Kubernetes in one step. No need to manually build and push your image, setup your kube-context, or write long pages of Kubernetes YAML.
 
