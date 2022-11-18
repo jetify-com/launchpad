@@ -26,7 +26,7 @@ The example below initializes a web project with `launchpad init`, and deploys t
 Launchpad builds any image, publishes it to your Docker Registry, and deploys it to Kubernetes in one step. No need to manually build and push your image, setup your kube-context, or write long pages of Kubernetes YAML.
 
 
-### A Heroku-like exprience on your own Kubernetes cluster
+### A Heroku-like experience on your own Kubernetes cluster
 
 Ever wonder how you'd graduate from Heroku or a single EC2 machine to Kubernetes without going through a painful setup again? Faint not! With Launchpad, no manual migrations are required. In fact, developers can deploy and run their applications without needing to learn Kubernetes. 
 
