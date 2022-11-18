@@ -60,7 +60,7 @@ func upCmd() *cobra.Command {
 
 	upCmd := &cobra.Command{
 		Use:     "up [path]",
-		Short:   "builds and deploys app",
+		Short:   "Builds and deploys app",
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: validateDeployUptions(&opts.deployOptions),
 		RunE: func(cmd *cobra.Command, args []string) error {
