@@ -57,7 +57,7 @@ func registerRootCmdFlags(cmd *cobra.Command) {
 		&cmdOpts.RootFlags().SkipVersionCheck,
 		"skip-version-check",
 		false,
-		"Skip CLI version check",
+		"skip CLI version check",
 	)
 	_ = cmd.PersistentFlags().MarkHidden("skip-version-check")
 
@@ -66,7 +66,7 @@ func registerRootCmdFlags(cmd *cobra.Command) {
 		&cmdOpts.RootFlags().Environment,
 		environmentFlagName,
 		"dev",
-		"The name of the environment this command should operate on. One of: dev, prod",
+		"the name of the environment this command should operate on. One of: dev, prod",
 	)
 }
 

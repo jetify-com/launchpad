@@ -17,7 +17,7 @@ import (
 func initCmd() *cobra.Command {
 	var initCmd = &cobra.Command{
 		Use:   "init [path]",
-		Short: "Initialize a new Launchpad config",
+		Short: "Initializes a new Launchpad config",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			authProvider := cmdOpts.AuthProvider()

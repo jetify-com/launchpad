@@ -16,7 +16,7 @@ func versionCmd() *cobra.Command {
 
 	var versionCmd = &cobra.Command{
 		Use:   "version",
-		Short: "Print the version number",
+		Short: "Prints the version number",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
