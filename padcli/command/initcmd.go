@@ -68,7 +68,8 @@ func projectDir(args []string) (string, error) {
 func initConfig(ctx context.Context, authProvider provider.Auth, path string) error {
 	appName, err := appName(path)
 	if err != nil {
-		return errors.WithStack(err)
+		// Some paths can't be turned into a valid name (e.g. "/")
+		appName = "my-app"
 	}
 	// check if jetconfig file exists
 	_, err = jetconfig.RequireFromFileSystem(ctx, path, cmdOpts.RootFlags().Env())
