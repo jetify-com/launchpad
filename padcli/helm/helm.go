@@ -156,12 +156,16 @@ func (hvc *ValueComputer) Compute(ctx context.Context) error {
 		SetNestedField(hvc.appValues, "service", "type", "NodePort")
 	}
 
+	// Legacy configs don't have an explicit web service. We might still need
+	// to set image values in case it's a legacy config that publishes an image.
+	configImage := ""
 	if websvc != nil {
-		repo, tag := hvc.imageProvider.getSplit(hvc.cluster, websvc.GetImage())
-		hvc.appValues["image"] = map[string]any{
-			"repository": repo,
-			"tag":        tag,
-		}
+		configImage = websvc.GetImage()
+	}
+	repo, tag := hvc.imageProvider.getSplit(hvc.cluster, configImage)
+	hvc.appValues["image"] = map[string]any{
+		"repository": repo,
+		"tag":        tag,
 	}
 
 	return nil
