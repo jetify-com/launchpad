@@ -66,7 +66,7 @@ func envCmd() *cobra.Command {
 			}
 			cmdCfg.EnvId = *envId
 
-			store, err := newEnvStore(ctx, cmd, args, cmdOpts.EnvSecProvider(), jetCfg.Envsec.Provider)
+			store, err := newEnvStoreForCurrentDir(ctx, cmd, args, cmdOpts.EnvSecProvider(), jetCfg.Envsec.Provider)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -124,6 +124,38 @@ func newEnvStore(
 	envSecProvider provider.EnvSec,
 	selectedProvider string,
 ) (envsec.Store, error) {
+	path, err := absPath(args)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return envStore(ctx, cmd, path, args, envSecProvider, selectedProvider)
+}
+
+// launchpad env does not accept path as argument
+func newEnvStoreForCurrentDir(
+	ctx context.Context,
+	cmd *cobra.Command,
+	args []string,
+	envSecProvider provider.EnvSec,
+	selectedProvider string,
+) (envsec.Store, error) {
+	path, err := absPath([]string{})
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return envStore(ctx, cmd, path, args, envSecProvider, selectedProvider)
+}
+
+func envStore(
+	ctx context.Context,
+	cmd *cobra.Command,
+	path string,
+	args []string,
+	envSecProvider provider.EnvSec,
+	selectedProvider string,
+) (envsec.Store, error) {
 	storeConfig := &envsec.SSMConfig{}
 
 	providedConfig, err := envSecProvider.Get(ctx, selectedProvider)
@@ -150,11 +182,6 @@ func newEnvStore(
 		return nil, errors.WithStack(err)
 	}
 
-	// Set jetconfig Envsec field.
-	path, err := absPath(args)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
 	jetCfg, err := jetconfig.RequireFromFileSystem(ctx, path, cmdOpts.RootFlags().Env())
 	if err != nil {
 		return nil, errors.WithStack(err)
