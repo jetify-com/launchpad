@@ -59,19 +59,22 @@ func NewUserErrorf(msg string, args ...any) *userError {
 }
 
 func CombinedError(original error, userErr *userError) error {
+	if original == nil || hasUserError(original) {
+		return original
+	}
 	return &combinedError{original, userErr}
 }
 
 func AddUserMessagef(original error, msg string, args ...any) error {
-	if original == nil {
-		return nil
+	if original == nil || hasUserError(original) {
+		return original
 	}
 	return &combinedError{original, NewUserError(fmt.Sprintf(msg, args...))}
 }
 
 func ConvertToUserError(err error) error {
-	if err == nil {
-		return nil
+	if err == nil || hasUserError(err) {
+		return err
 	}
 	return AddUserMessagef(err, err.Error())
 }
@@ -116,4 +119,11 @@ func (err *combinedError) Cause() error { return errors.Cause(err.original) }
 // Format allows us to use %+v as implemented by github.com/pkg/errors.
 func (err *combinedError) Format(s fmt.State, verb rune) {
 	err.Combine().Format(s, verb)
+}
+
+// hasUserError returns true if the error is a user error or combined
+func hasUserError(err error) bool {
+	ce := &combinedError{}
+	us := &userError{}
+	return errors.As(err, &ce) || errors.As(err, &us)
 }

@@ -1,12 +1,21 @@
 {
   "packages": [
     "go_1_19",
-    "buf"
+    "buf",
+    "golangci-lint"
   ],
   "shell": {
-    "init_hook": null
+    "init_hook": [
+      "export \"GOROOT=$(go env GOROOT)\"",
+      "export \"PATH=$(pwd)/dist:$PATH\""
+    ],
+    "scripts": {
+      "build": "go build -o dist/launchpad cmd/launchpad/main.go",
+      "lint": "golangci-lint run",
+      "test": "go test -race -cover ./..."
+    }
   },
   "nixpkgs": {
-    "commit": "af9e00071d0971eb292fd5abef334e66eda3cb69"
+    "commit": "3954218cf613eba8e0dcefa9abe337d26bc48fd0"
   }
 }
