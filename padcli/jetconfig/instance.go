@@ -50,6 +50,8 @@ func (i *InstanceType) Compute() string {
 		return "500m"
 	case InstanceType_MEDIUM:
 		return "1000m"
+	case InstanceType_MEDIUM_PLUS:
+		return "1500m"
 	default:
 		return ""
 	}
@@ -68,6 +70,8 @@ func (i *InstanceType) Memory() string {
 		return "1024Mi"
 	case InstanceType_MEDIUM:
 		return "2048Mi"
+	case InstanceType_MEDIUM_PLUS:
+		return "3072Mi"
 	default:
 		return ""
 	}
