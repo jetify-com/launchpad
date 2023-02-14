@@ -8,4 +8,5 @@ enum InstanceType {
   MICRO = 2;
   SMALL = 3;
   MEDIUM = 4;
+  MEDIUM_PLUS = 5;
 }

@@ -12,7 +12,8 @@
     "scripts": {
       "build": "go build -o dist/launchpad cmd/launchpad/main.go",
       "lint": "golangci-lint run",
-      "test": "go test -race -cover ./..."
+      "test": "go test -race -cover ./...",
+      "buf-gen": "buf generate"
     }
   },
   "nixpkgs": {
