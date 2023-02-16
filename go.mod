@@ -12,7 +12,7 @@ require (
 	github.com/bep/debounce v1.2.1
 	github.com/briandowns/spinner v1.19.0
 	github.com/cenkalti/backoff/v4 v4.1.3
-	github.com/containerd/containerd v1.6.15
+	github.com/containerd/containerd v1.6.18
 	github.com/docker/cli v20.10.21+incompatible
 	github.com/docker/docker v20.10.21+incompatible
 	github.com/docker/go-connections v0.4.0
