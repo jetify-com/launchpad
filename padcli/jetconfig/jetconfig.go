@@ -57,17 +57,21 @@ type Config struct {
 	selectedEnvironment api.Environment
 }
 
-// isPathFormatAConfigFile returns true if the path looks like a config file even
-// if the file doesn't exist
+// isPathFormatAConfigFile returns true if the path format represents a config
+// file (i.e. is not a directory). If the path doesn't exist, we assume it must
+// be a file (e.g. /path/to/some-new-file.yaml). We do this because this
+// function may be called before the config is actually created.
 func isPathFormatAConfigFile(path string) bool {
 	fi, err := os.Stat(path)
-	if err == nil && !fi.IsDir() {
-		return true
+	if err == nil {
+		// path already exists. If it's a dir it can't be a config file. If
+		// it's a file assume it's a config file.
+		return !fi.IsDir()
 	}
-	// Handle new configs:
-	// There's probably better more general ways to do this, but this if ok for
-	// now. Assume that if base contains a period it's a file.
-	return strings.ContainsRune(filepath.Base(path), '.')
+
+	// If path doesn't exist, always assume it's a config file. if more than the
+	// base of the path doesn't exist this will fail and that's ok.
+	return true
 }
 
 func configPath(path string) string {
