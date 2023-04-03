@@ -47,10 +47,10 @@ require (
 	google.golang.org/protobuf v1.30.0
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.11.2
-	k8s.io/api v0.26.3
-	k8s.io/apimachinery v0.26.3
-	k8s.io/cli-runtime v0.26.3
-	k8s.io/client-go v0.26.3
+	k8s.io/api v0.28.0-alpha.0
+	k8s.io/apimachinery v0.28.0-alpha.0
+	k8s.io/cli-runtime v0.28.0-alpha.0
+	k8s.io/client-go v0.28.0-alpha.0
 	k8s.io/kubectl v0.26.3
 	sigs.k8s.io/kind v0.17.0
 	sigs.k8s.io/yaml v1.3.0
@@ -89,7 +89,7 @@ require (
 	github.com/chai2010/gettext-go v1.0.2 // indirect
 	github.com/charmbracelet/lipgloss v0.7.1 // indirect
 	github.com/containerd/console v1.0.3 // indirect
-	github.com/containerd/continuity v0.3.0 // indirect
+	github.com/containerd/continuity v0.3.1-0.20230206214859-2a963a2f56e8 // indirect
 	github.com/containerd/typeurl v1.0.2 // indirect
 	github.com/containerd/typeurl/v2 v2.1.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
@@ -220,4 +220,4 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 )
 
-replace github.com/tonistiigi/fsutil => github.com/jetpack-io/fsutil v0.1.2
+// replace github.com/tonistiigi/fsutil => github.com/jetpack-io/fsutil v0.1.2
