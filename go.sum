@@ -1327,6 +1327,8 @@ go.jetpack.io/envsec v0.0.0-20221018201944-28db02041c0e h1:K31ovlZolcNDlJumJrNtS
 go.jetpack.io/envsec v0.0.0-20221018201944-28db02041c0e/go.mod h1:lYv0Fn30P6dU5+gGLJbI4LJuTcojdSVXn5xlNSZivNc=
 go.jetpack.io/envsec v0.0.0-20221116211416-4442fe6fe636 h1:/DKzXHDaJp1mScMGgIAKPY4/kGe8JJVo3Lj9IoFIcWA=
 go.jetpack.io/envsec v0.0.0-20221116211416-4442fe6fe636/go.mod h1:lYv0Fn30P6dU5+gGLJbI4LJuTcojdSVXn5xlNSZivNc=
+go.jetpack.io/envsec v0.0.0-20230331210001-db4e019e9034 h1:3grdrEArYI6CFYNE0qC9GTPiEZQBFQOZPVs2QBvwA10=
+go.jetpack.io/envsec v0.0.0-20230331210001-db4e019e9034/go.mod h1:cMXp8olvWrCq+P7DQp0R7mfK+Klyg+VAWXCrphUhgoA=
 go.mozilla.org/pkcs7 v0.0.0-20200128120323-432b2356ecb1/go.mod h1:SNgMg+EgDFwmvSmLRTNKC5fegJjB7v23qTQ0XLGUNHk=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
