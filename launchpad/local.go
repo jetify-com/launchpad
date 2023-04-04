@@ -157,7 +157,7 @@ func stopAndRemoveContainer(
 	respID string,
 ) error {
 	yellow.Fprintln(logger, "Attempting to stop container...")
-	err := cli.ContainerStop(ctx, respID, nil)
+	err := cli.ContainerStop(ctx, respID, container.StopOptions{})
 	if err != nil {
 		return errors.Wrap(err, "failed to stop container")
 	}
