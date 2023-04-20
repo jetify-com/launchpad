@@ -5,6 +5,7 @@ type Cron interface {
 	Builder
 	Service
 	GetSchedule() string
+	GetConcurrencyPolicy() string
 	GetCommand() []string
 }
 
@@ -32,16 +33,24 @@ func (c *Config) AddNewCronService(
 
 // Private cron struct
 type cron struct {
-	service  `yaml:",inline,omitempty"`
-	builder  `yaml:",inline,omitempty"`
-	Command  []string `yaml:"command,omitempty,flow"`
-	Schedule string   `yaml:"schedule,omitempty"`
+	service          `yaml:",inline,omitempty"`
+	builder          `yaml:",inline,omitempty"`
+	Command          []string `yaml:"command,omitempty,flow"`
+	Schedule         string   `yaml:"schedule,omitempty"`
+	ConcurrentPolicy string   `yaml:"concurrencyPolicy,omitempty"`
 }
 
 var _ Cron = (*cron)(nil)
 
 func (c *cron) GetSchedule() string {
 	return c.Schedule
+}
+
+func (c *cron) GetConcurrencyPolicy() string {
+	if c.ConcurrentPolicy == "" {
+		return "Allow" // k8s default
+	}
+	return c.ConcurrentPolicy
 }
 
 func (c *cron) GetCommand() []string {

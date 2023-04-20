@@ -98,10 +98,11 @@ func (hvc *ValueComputer) Compute(ctx context.Context) error {
 		hvc.jetCfg.Cronjobs(),
 		func(cj jetconfig.Cron, _ int) any {
 			return map[string]any{
-				"name":     ToValidName(cj.GetUniqueName()),
-				"schedule": cj.GetSchedule(),
-				"image":    hvc.imageProvider.get(hvc.cluster, cj.GetImage()),
-				"command":  cj.GetCommand(),
+				"name":              ToValidName(cj.GetUniqueName()),
+				"schedule":          cj.GetSchedule(),
+				"concurrencyPolicy": cj.GetConcurrencyPolicy(),
+				"image":             hvc.imageProvider.get(hvc.cluster, cj.GetImage()),
+				"command":           cj.GetCommand(),
 				"resources": map[string]any{
 					"requests": map[string]any{
 						"cpu":    cj.GetInstanceType().Compute(),
