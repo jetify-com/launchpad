@@ -1,8 +1,8 @@
 {
   "packages": [
-    "go_1_19",
-    "buf",
-    "golangci-lint"
+    "go@latest",
+    "buf@latest",
+    "golangci-lint@latest"
   ],
   "shell": {
     "init_hook": [
