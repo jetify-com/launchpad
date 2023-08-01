@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -34,6 +35,7 @@ import (
 	"go.jetpack.io/launchpad/padcli/hook"
 	"go.jetpack.io/launchpad/padcli/jetconfig"
 	"go.jetpack.io/launchpad/padcli/provider"
+	"go.jetpack.io/launchpad/pkg/docker"
 	"go.jetpack.io/launchpad/pkg/jetlog"
 	"go.jetpack.io/launchpad/pkg/kubevalidate"
 
@@ -293,6 +295,25 @@ func executeBuildPlan(ctx context.Context, plan *BuildPlan) error {
 
 func executePlanUsingDocker(ctx context.Context, plan *BuildPlan) (err error) {
 	jetlog.Logger(ctx).IndentedPrintf("Building Docker image with Dockerfile at: %s\n", plan.dockerfilePath)
+
+	// Pulling out in case we want to allow customizing this var in the future.
+	dockerfile := "Dockerfile"
+
+	imageBuildOptions := dockertypes.ImageBuildOptions{
+		BuildArgs: lo.MapValues(plan.buildOpts.BuildArgs, func(val, _ string) *string {
+			return &val
+		}),
+		Dockerfile:     dockerfile,
+		Platform:       plan.buildOpts.Platform,
+		SuppressOutput: false,
+		Tags:           []string{plan.image.String()},
+		Labels:         plan.imageLabels,
+	}
+
+	if useCli, _ := strconv.ParseBool(os.Getenv("LAUNCHPAD_USE_DOCKER_CLI")); useCli {
+		return docker.Build(ctx, filepath.Dir(plan.dockerfilePath), imageBuildOptions)
+	}
+
 	cli, err := dockerclient.NewClientWithOpts(
 		dockerclient.FromEnv,
 		dockerclient.WithAPIVersionNegotiation(),
@@ -305,27 +326,15 @@ func executePlanUsingDocker(ctx context.Context, plan *BuildPlan) (err error) {
 	if err != nil {
 		return errors.Wrap(err, "failed to detect docker builder version")
 	}
+	imageBuildOptions.Version = version
 
-	// Pulling out in case we want to allow customizing this var in the future.
-	dockerfile := "Dockerfile"
 	buildCtx, err := dockerBuildContext(plan, dockerfile)
 	if err != nil {
 		return errors.Wrap(err, "tar docker build context")
 	}
 	defer buildCtx.Close()
 
-	imageBuildOptions := dockertypes.ImageBuildOptions{
-		BuildArgs: lo.MapValues(plan.buildOpts.BuildArgs, func(val, _ string) *string {
-			return &val
-		}),
-		Dockerfile:     dockerfile,
-		Platform:       plan.buildOpts.Platform,
-		SuppressOutput: false,
-		Tags:           []string{plan.image.String()},
-		Version:        version,
-		Labels:         plan.imageLabels,
-	}
-
+	// TODO: docker.Build does not currently implement remote cache
 	if plan.buildOpts.RemoteCache {
 		imageBuildOptions.BuildArgs["BUILDKIT_INLINE_CACHE"] = lo.ToPtr("1")
 		c, err := decodeCredentials(plan.buildOpts.RepoConfig)
