@@ -311,7 +311,7 @@ func executePlanUsingDocker(ctx context.Context, plan *BuildPlan) (err error) {
 	}
 
 	if useCli, _ := strconv.ParseBool(os.Getenv("LAUNCHPAD_USE_DOCKER_CLI")); useCli {
-		return docker.Build(filepath.Dir(plan.dockerfilePath), imageBuildOptions)
+		return docker.Build(ctx, filepath.Dir(plan.dockerfilePath), imageBuildOptions)
 	}
 
 	cli, err := dockerclient.NewClientWithOpts(

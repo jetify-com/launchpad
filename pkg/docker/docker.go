@@ -1,16 +1,17 @@
 package docker
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/docker/docker/api/types"
-	"go.jetpack.io/launchpad/pkg/cmdutil"
 )
 
-func Build(path string, opts types.ImageBuildOptions) error {
-	cmd := cmdutil.CommandTTY("docker", "build", path)
+func Build(ctx context.Context, path string, opts types.ImageBuildOptions) error {
+	cmd := command(ctx, "docker", "build", path)
 	cmd.Env = append(os.Environ(), "DOCKER_BUILDKIT=1")
 	for _, tag := range opts.Tags {
 		cmd.Args = append(cmd.Args, "-t", tag)
@@ -26,4 +27,11 @@ func Build(path string, opts types.ImageBuildOptions) error {
 	}
 	fmt.Fprintln(os.Stderr, cmd.String())
 	return cmd.Run()
+}
+
+func command(ctx context.Context, name string, arg ...string) *exec.Cmd {
+	cmd := exec.CommandContext(ctx, name, arg...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd
 }
