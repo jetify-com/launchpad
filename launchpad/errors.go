@@ -32,10 +32,6 @@ var errUserNoDockerClient = errorutil.NewUserError(
 	"Unable to get docker cli client. Are you sure Docker is installed?",
 )
 
-var errOldDockerAPIVersion = errorutil.NewUserError(
-	"Launchpad requires your Docker API version to be at least 1.39",
-)
-
 var errNoValidChartVersions = errors.New(
 	"Could not find any valid chart versions",
 )

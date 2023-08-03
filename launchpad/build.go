@@ -2,45 +2,26 @@ package launchpad
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
-	"sync"
 	"time"
 
-	"github.com/cenkalti/backoff/v4"
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/api/types/versions"
 	dockerclient "github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/archive"
-	"github.com/docker/docker/pkg/jsonmessage"
-	"github.com/moby/buildkit/frontend/dockerfile/dockerignore"
-	"github.com/moby/buildkit/session"
-	"github.com/moby/buildkit/session/sshforward/sshprovider"
-	"github.com/moby/buildkit/util/progress/progressui"
-	"github.com/moby/term"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"github.com/spf13/afero"
 	"go.jetpack.io/launchpad/goutil/errorutil"
-	"go.jetpack.io/launchpad/launchpad/authprovider"
 	"go.jetpack.io/launchpad/padcli/hook"
 	"go.jetpack.io/launchpad/padcli/jetconfig"
 	"go.jetpack.io/launchpad/padcli/provider"
 	"go.jetpack.io/launchpad/pkg/docker"
 	"go.jetpack.io/launchpad/pkg/jetlog"
 	"go.jetpack.io/launchpad/pkg/kubevalidate"
-
-	controlapi "github.com/moby/buildkit/api/services/control"
-	buildkitClient "github.com/moby/buildkit/client"
 )
 
 const (
@@ -299,241 +280,17 @@ func executePlanUsingDocker(ctx context.Context, plan *BuildPlan) (err error) {
 	// Pulling out in case we want to allow customizing this var in the future.
 	dockerfile := "Dockerfile"
 
-	imageBuildOptions := dockertypes.ImageBuildOptions{
+	imageBuildOptions := docker.BuildOpts{
 		BuildArgs: lo.MapValues(plan.buildOpts.BuildArgs, func(val, _ string) *string {
 			return &val
 		}),
-		Dockerfile:     dockerfile,
-		Platform:       plan.buildOpts.Platform,
-		SuppressOutput: false,
-		Tags:           []string{plan.image.String()},
-		Labels:         plan.imageLabels,
+		Dockerfile: dockerfile,
+		Platform:   plan.buildOpts.Platform,
+		Tags:       []string{plan.image.String()},
+		Labels:     plan.imageLabels,
 	}
 
-	if useCli, _ := strconv.ParseBool(os.Getenv("LAUNCHPAD_USE_DOCKER_CLI")); useCli {
-		return docker.Build(ctx, filepath.Dir(plan.dockerfilePath), imageBuildOptions)
-	}
-
-	cli, err := dockerclient.NewClientWithOpts(
-		dockerclient.FromEnv,
-		dockerclient.WithAPIVersionNegotiation(),
-	)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	version, err := getDockerBuilderVersion(ctx, plan.projectDir)
-	if err != nil {
-		return errors.Wrap(err, "failed to detect docker builder version")
-	}
-	imageBuildOptions.Version = version
-
-	buildCtx, err := dockerBuildContext(plan, dockerfile)
-	if err != nil {
-		return errors.Wrap(err, "tar docker build context")
-	}
-	defer buildCtx.Close()
-
-	// TODO: docker.Build does not currently implement remote cache
-	if plan.buildOpts.RemoteCache {
-		imageBuildOptions.BuildArgs["BUILDKIT_INLINE_CACHE"] = lo.ToPtr("1")
-		c, err := decodeCredentials(plan.buildOpts.RepoConfig)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		imageBuildOptions.AuthConfigs = map[string]dockertypes.AuthConfig{
-			plan.buildOpts.GetRepoHost(): {
-				Username: c.Username,
-				Password: c.Password,
-			},
-		}
-		if plan.buildOpts.ImageRepoForCache != "" {
-			imageBuildOptions.CacheFrom = []string{
-				plan.buildOpts.ImageRepoForCache + ":latest",
-			}
-		}
-	}
-
-	if err = initBuildkitSession(ctx, cli, &imageBuildOptions, plan); err != nil {
-		return errors.WithStack(err)
-	}
-
-	// Sometimes Docker fails with a "no active session" error.
-	// There isn't a reliable fix for this other than retry. This
-	// retry mechanism reduces the chance of that error persisting.
-	b := backoff.NewExponentialBackOff()
-	// 3 minutes seems long, we can shorten this if we observe retry is taking too long
-	b.MaxElapsedTime = 3 * time.Minute
-	resp := dockertypes.ImageBuildResponse{}
-	imageBuildRetrier := func() error {
-		resp, err = cli.ImageBuild(ctx, buildCtx, imageBuildOptions)
-		if err != nil {
-			if strings.Contains(err.Error(), "no active session") {
-				jetlog.Logger(ctx).Print(
-					"\nERROR: No active Buildkit session found. Retrying...\n",
-				)
-			}
-			return err
-		} else {
-			// if error is not "no active session" we don't need to retry
-			return backoff.Permanent(err)
-		}
-	}
-	err = backoff.Retry(imageBuildRetrier, b)
-	if err != nil {
-		return errors.Wrapf(
-			err,
-			"failed docker image build for %s",
-			plan.image.String(),
-		)
-	}
-
-	defer resp.Body.Close()
-
-	if version == dockertypes.BuilderBuildKit {
-		customWriter := dockerWriter{}
-		err = writeDockerOutput(ctx, customWriter, resp)
-		return errors.Wrap(err, "failed to print docker image build output")
-	}
-
-	// thank you: https://stackoverflow.com/a/58742917
-	termFd, isTerm := term.GetFdInfo(os.Stderr)
-	customWriter := dockerWriter{}
-	err = jsonmessage.DisplayJSONMessagesStream(resp.Body, customWriter, termFd, isTerm, nil /*auxCallback */)
-	return errors.Wrap(err, "failed to print image-build output")
-}
-
-// writeDockerOutput will convert the buildkit graph structures to be printable.
-//
-// Specifically:
-// - it converts the `resp types.ImageBuildResponse` argument into JSONMessage structs
-// - JSONMessage.Aux has protobuf messages of the buildkit graph
-// - These protobuf messages are converted to buildkit's golang structs, which are placed into SolveStatus struct.
-// - SolveStatus structs are consumed by moby's progressui library to be printed
-//
-// inspired by:
-// https://github.com/docker/docker-ce/blob/master/components/cli/cli/command/image/build_buildkit.go
-func writeDockerOutput(ctx context.Context, jetpackPrinter io.Writer, resp dockertypes.ImageBuildResponse) error {
-
-	// This WaitGroup is needed to ensure that all the solveStatus values below are printed
-	// prior to exiting. Without this, the next launchpad-step's output (publish) may begin printing.
-	var wg sync.WaitGroup
-	defer wg.Wait()
-
-	// This channel is used to send SolveStatus from auxCallback to progressui.DisplaySolveStatus
-	solveStatus := make(chan *buildkitClient.SolveStatus)
-	defer close(solveStatus)
-
-	// The caller must wait for this goroutine to print all SolveStatuses
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-
-		// A console can be used to print docker build output, and then "rewrite it" so that
-		// it becomes compact if the build steps were successful. This is similar to what
-		// docker CLI does for `docker image build`.
-		//
-		// However, due to how `jetpackPrinter` rewrites the output (via indentation)
-		// the progressui output gets messed up. Hence, this is commented out for now.
-		//
-		// For now, we can pass "nil" as console to progressui.DisplaySolveStatus.
-		//
-		// import "github.com/containerd/console"
-		//cons, err := console.ConsoleFromFile(jetpackPrinter)
-		//if err != nil {
-		//	return errors.Wrap(err, "failed to set console")
-		//}
-
-		_, err := progressui.DisplaySolveStatus(ctx, "", nil /*console*/, jetpackPrinter, solveStatus)
-		if err != nil {
-			// Note, we are okay printing and continuing due to this error.
-			// The progressui is for printing docker build info, but we shouldn't
-			// block a deploy if there is some error due to it.
-			fmt.Printf("ERROR: from DisplaySolveStatus. %v\n", err)
-		}
-	}()
-
-	// auxCallback constructs SolveStatus structs to send to the solveStatus channel,
-	// which is in turn consumed by DisplaySolveStatus in the above goroutine.
-	//
-	// auxCallback is invoked by jsonmessage.DisplayJSONMessagesStream below.
-	auxCallback := func(msg jsonmessage.JSONMessage) {
-		if msg.ID != "moby.buildkit.trace" {
-			return
-		}
-
-		var dt []byte
-		// ignoring all messages that are not understood
-		if err := json.Unmarshal(*msg.Aux, &dt); err != nil {
-			// deliberately not logging error
-			return
-		}
-		var resp controlapi.StatusResponse
-		if err := (&resp).Unmarshal(dt); err != nil {
-			// deliberately not logging error
-			return
-		}
-
-		// The following lines copy protobuf structs of the buildkit Graph
-		// into the buildkit's golang structs for the graph represented by SolveStatus
-		s := buildkitClient.SolveStatus{}
-		for _, v := range resp.Vertexes {
-			s.Vertexes = append(s.Vertexes, &buildkitClient.Vertex{
-				Digest:    v.Digest,
-				Inputs:    v.Inputs,
-				Name:      v.Name,
-				Started:   v.Started,
-				Completed: v.Completed,
-				Error:     v.Error,
-				Cached:    v.Cached,
-			})
-		}
-		for _, v := range resp.Statuses {
-			s.Statuses = append(s.Statuses, &buildkitClient.VertexStatus{
-				ID:        v.ID,
-				Vertex:    v.Vertex,
-				Name:      v.Name,
-				Total:     v.Total,
-				Current:   v.Current,
-				Timestamp: v.Timestamp,
-				Started:   v.Started,
-				Completed: v.Completed,
-			})
-		}
-		for _, v := range resp.Logs {
-			s.Logs = append(s.Logs, &buildkitClient.VertexLog{
-				Vertex:    v.Vertex,
-				Stream:    int(v.Stream),
-				Data:      v.Msg,
-				Timestamp: v.Timestamp,
-			})
-		}
-
-		solveStatus <- &s
-	}
-
-	termFd, isTerm := term.GetFdInfo(jetpackPrinter)
-	err := jsonmessage.DisplayJSONMessagesStream(resp.Body, jetpackPrinter, termFd, isTerm, auxCallback)
-	return errors.Wrap(err, "failed to print image-push output")
-}
-
-func dockerBuildContext(
-	plan *BuildPlan,
-	dockerfileName string,
-) (io.ReadCloser, error) {
-	opts := archive.TarOptions{}
-	f, err := os.Open(filepath.Join(plan.projectDir, ".dockerignore"))
-	if err == nil {
-		defer f.Close()
-		patterns, err := dockerignore.ReadAll(f)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-		opts.ExcludePatterns = lo.Filter(patterns, func(s string, _ int) bool {
-			return s != dockerfileName
-		})
-	}
-	return archive.TarWithOptions(plan.projectDir, &opts)
+	return docker.Build(ctx, filepath.Dir(plan.dockerfilePath), imageBuildOptions)
 }
 
 // getImageNameAndTag returns a valid docker image name
@@ -546,110 +303,6 @@ func getImageNameAndTag(ctx context.Context, opts *BuildOptions) (string, string
 	}
 
 	return name, generateDateImageTag(opts.TagPrefix), nil
-}
-
-// This function inspired by https://github.com/hashicorp/waypoint/pull/1937
-func initBuildkitSession(
-	ctx context.Context,
-	dockerClient *dockerclient.Client,
-	buildOpts *dockertypes.ImageBuildOptions,
-	plan *BuildPlan,
-) error {
-	if buildOpts.Version == dockertypes.BuilderV1 {
-		return nil
-	}
-
-	const minDockerVersion = "1.39" // This is only required for buildkit.
-
-	if !versions.GreaterThanOrEqualTo(
-		dockerClient.ClientVersion(), minDockerVersion) {
-		return errOldDockerAPIVersion
-	}
-
-	buildkitSession, err := session.NewSession(ctx, "jetpack", "")
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	defer buildkitSession.Close()
-
-	// This env-var is set when sshagent is configured
-	if os.Getenv("SSH_AUTH_SOCK") != "" {
-		// This allows us to use --mount=type=ssh in the dockerfile
-		configs := []sshprovider.AgentConfig{{ID: "default"}}
-		if a, err := sshprovider.NewSSHAgentProvider(configs); err != nil {
-			// TODO(Landau), show good user error if ssh keys are not added to agent
-			return errors.WithStack(err)
-		} else {
-			buildkitSession.Allow(a)
-		}
-	} else {
-		jetlog.Logger(ctx).IndentedPrintln("Warning: Did not find SSH_AUTH_SOCK env var. " +
-			"Skipping ssh agent provider for docker buildkit.")
-	}
-
-	if plan.buildOpts.RemoteCache {
-		c, err := decodeCredentials(plan.buildOpts.RepoConfig)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		buildkitSession.Allow(authprovider.NewDockerAuthProvider(authprovider.NewConfig(
-			plan.buildOpts.GetRepoHost(),
-			c.Username,
-			c.Password,
-		)))
-	}
-
-	dialSession := func(
-		ctx context.Context,
-		proto string,
-		meta map[string][]string,
-	) (net.Conn, error) {
-		return dockerClient.DialHijack(ctx, "/session", proto, meta)
-	}
-
-	go func() {
-		err = buildkitSession.Run(ctx, dialSession)
-		if err != nil {
-			panic(err) // Is there a better way to handle this?
-		}
-	}()
-
-	buildOpts.SessionID = buildkitSession.ID()
-
-	return nil
-}
-
-func getDockerBuilderVersion(ctx context.Context, path string) (dockertypes.BuilderVersion, error) {
-	// Respect env-var
-	if os.Getenv("DOCKER_BUILDKIT") == "1" {
-		jetlog.Logger(ctx).IndentedPrintln("Detecting DOCKER_BUILDKIT=1. Using Buildkit Docker builder.")
-		return dockertypes.BuilderBuildKit, nil
-	}
-	if os.Getenv("DOCKER_BUILDKIT") == "0" {
-		jetlog.Logger(ctx).IndentedPrintln("Detecting DOCKER_BUILDKIT=0. Using v1 Docker builder.")
-		return dockertypes.BuilderV1, nil
-	}
-
-	// Fallback to reading the Dockerfile
-	content, err := os.ReadFile(filepath.Join(path, "Dockerfile"))
-	if err != nil {
-		jetlog.Logger(ctx).IndentedPrintf("No detecting Dockerfile at %s. Using v1 Docker builder.\n", path)
-		return dockertypes.BuilderV1, errors.WithStack(err)
-	}
-	trimmed := strings.TrimSpace(string(content))
-
-	if strings.HasPrefix(trimmed, "# syntax") {
-		jetlog.Logger(ctx).IndentedPrintln("Detecting # syntax in Dockerfile. Using Buildkit Docker builder.")
-		return dockertypes.BuilderBuildKit, nil
-	}
-
-	if strings.Contains(trimmed, "RUN --mount") {
-		jetlog.Logger(ctx).IndentedPrintln("Detecting RUN --mount in Dockerfile. Using Buildkit Docker builder.")
-		return dockertypes.BuilderBuildKit, nil
-	}
-
-	jetlog.Logger(ctx).IndentedPrintln("Using v1 Docker builder.")
-	return dockertypes.BuilderV1, nil
 }
 
 // DockerCleanup deletes all docker images that are not the latest based on timestamp.
@@ -699,21 +352,4 @@ func DockerCleanup(ctx context.Context, labelIdentifier string) error {
 	}
 
 	return nil
-}
-
-type imageRepoCredentials struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-func decodeCredentials(c provider.RepoConfig) (*imageRepoCredentials, error) {
-	if c == nil || c.GetCredentials() == "" {
-		return nil, nil
-	}
-	s, err := base64.StdEncoding.DecodeString(c.GetCredentials())
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	creds := &imageRepoCredentials{}
-	return creds, json.Unmarshal(s, creds)
 }
