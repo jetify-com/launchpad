@@ -11,7 +11,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.18.7
 	github.com/bep/debounce v1.2.1
 	github.com/briandowns/spinner v1.23.0
-	github.com/cenkalti/backoff/v4 v4.2.0
 	github.com/containerd/containerd v1.7.2
 	github.com/docker/cli v23.0.6+incompatible
 	github.com/docker/docker v23.0.6+incompatible
@@ -154,7 +153,6 @@ require (
 	github.com/moby/locker v1.0.1 // indirect
 	github.com/moby/patternmatcher v0.5.0 // indirect
 	github.com/moby/spdystream v0.2.0 // indirect
-	github.com/moby/sys/sequential v0.5.0 // indirect
 	github.com/moby/sys/signal v0.7.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
