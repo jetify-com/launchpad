@@ -146,6 +146,13 @@ func (hvc *ValueComputer) Compute(ctx context.Context) error {
 			websvc.GetInstanceType().Memory(),
 		)
 
+		if *websvc.GetInstanceType() == jetconfig.InstanceType_MEDIUM_PLUS {
+			setNestedFieldPath(
+				hvc.appValues,
+				[]string{"resources", "requests", "ephemeral-storage"},
+				"8Gi",
+			)
+		}
 		hvc.appValues["podPort"] = websvc.GetPort()
 	} else {
 		// This logic will change once we allow multiple services
