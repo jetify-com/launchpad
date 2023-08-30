@@ -2,22 +2,22 @@
   "lockfile_version": "1",
   "packages": {
     "buf@latest": {
-      "last_modified": "2023-06-29T16:20:38Z",
-      "resolved": "github:NixOS/nixpkgs/3c614fbc76fc152f3e1bc4b2263da6d90adf80fb#buf",
+      "last_modified": "2023-08-10T15:58:45Z",
+      "resolved": "github:NixOS/nixpkgs/4d2389b927696ef8da4ef76b03f2d306faf87929#buf",
+      "source": "devbox-search",
+      "version": "1.26.1"
+    },
+    "go@latest": {
+      "last_modified": "2023-08-22T06:04:29Z",
+      "resolved": "github:NixOS/nixpkgs/9d757ec498666cc1dcc6f2be26db4fd3e1e9ab37#go_1_21",
       "source": "devbox-search",
       "version": "1.21.0"
     },
-    "go@latest": {
-      "last_modified": "2023-06-29T16:20:38Z",
-      "resolved": "github:NixOS/nixpkgs/3c614fbc76fc152f3e1bc4b2263da6d90adf80fb#go",
-      "source": "devbox-search",
-      "version": "1.20.5"
-    },
     "golangci-lint@latest": {
-      "last_modified": "2023-06-29T16:20:38Z",
-      "resolved": "github:NixOS/nixpkgs/3c614fbc76fc152f3e1bc4b2263da6d90adf80fb#golangci-lint",
+      "last_modified": "2023-08-22T06:04:29Z",
+      "resolved": "github:NixOS/nixpkgs/9d757ec498666cc1dcc6f2be26db4fd3e1e9ab37#golangci-lint",
       "source": "devbox-search",
-      "version": "1.53.3"
+      "version": "1.54.2"
     }
   }
 }
