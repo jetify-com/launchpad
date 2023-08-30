@@ -150,7 +150,7 @@ func (hvc *ValueComputer) Compute(ctx context.Context) error {
 			setNestedFieldPath(
 				hvc.appValues,
 				[]string{"resources", "requests", "ephemeral-storage"},
-				"8Gi",
+				"10Gi",
 			)
 		}
 		hvc.appValues["podPort"] = websvc.GetPort()
