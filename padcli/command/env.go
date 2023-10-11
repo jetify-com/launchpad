@@ -3,20 +3,20 @@ package command
 import (
 	"context"
 	"os"
+	"path"
 	"path/filepath"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"go.jetpack.io/envsec"
-	"go.jetpack.io/envsec/envcli"
+	"go.jetpack.io/envsec/pkg/envcli"
 	"go.jetpack.io/launchpad/padcli/jetconfig"
 	"go.jetpack.io/launchpad/padcli/provider"
 	"go.jetpack.io/launchpad/pkg/jetlog"
 )
 
 func envCmd() *cobra.Command {
-	cmdCfg := &envcli.CmdConfig{}
 	command := &cobra.Command{
 		Use:   "env",
 		Short: "Manage environment variables and secrets",
@@ -64,13 +64,16 @@ func envCmd() *cobra.Command {
 			if envId == nil {
 				return errors.New("unexpected nil envId")
 			}
-			cmdCfg.EnvId = *envId
 
 			store, err := newEnvStoreForCurrentDir(ctx, cmd, args, cmdOpts.EnvSecProvider(), jetCfg.Envsec.Provider)
 			if err != nil {
 				return errors.WithStack(err)
 			}
-			cmdCfg.Store = store
+
+			envcli.BootstrapConfig(&envcli.CmdConfig{
+				Store: store,
+				EnvID: *envId,
+			})
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -79,12 +82,12 @@ func envCmd() *cobra.Command {
 	}
 
 	command.AddCommand(
-		envcli.SetCmd(cmdCfg),
-		envcli.RemoveCmd(cmdCfg),
-		envcli.ListCmd(cmdCfg),
-		envcli.UploadCmd(cmdCfg),
-		envcli.DownloadCmd(cmdCfg),
-		envcli.ExecCmd(cmdCfg),
+		envcli.SetCmd(),
+		envcli.RemoveCmd(),
+		envcli.ListCmd(),
+		envcli.UploadCmd(),
+		envcli.DownloadCmd(),
+		envcli.ExecCmd(),
 	)
 	return command
 }
@@ -151,7 +154,7 @@ func newEnvStoreForCurrentDir(
 func envStore(
 	ctx context.Context,
 	cmd *cobra.Command,
-	path string,
+	curDir string,
 	args []string,
 	envSecProvider provider.EnvSec,
 	selectedProvider string,
@@ -170,10 +173,16 @@ func envStore(
 	if providedConfig != nil {
 		storeConfig = &envsec.SSMConfig{
 			Region:          providedConfig.GetRegion(),
-			AccessKeyId:     providedConfig.GetAccessKeyId(),
+			AccessKeyID:     providedConfig.GetAccessKeyId(),
 			SecretAccessKey: providedConfig.GetSecretAccessKey(),
 			SessionToken:    providedConfig.GetSessionToken(),
-			KmsKeyId:        providedConfig.GetKmsKeyId(),
+			KmsKeyID:        providedConfig.GetKmsKeyId(),
+			VarPathFn: func(envID envsec.EnvID, varName string) string {
+				return path.Join(envID.ProjectID, envID.EnvName, varName)
+			},
+			PathNamespaceFn: func(envID envsec.EnvID) string {
+				return envID.ProjectID
+			},
 		}
 	}
 
@@ -182,14 +191,14 @@ func envStore(
 		return nil, errors.WithStack(err)
 	}
 
-	jetCfg, err := jetconfig.RequireFromFileSystem(ctx, path, cmdOpts.RootFlags().Env())
+	jetCfg, err := jetconfig.RequireFromFileSystem(ctx, curDir, cmdOpts.RootFlags().Env())
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
 	if jetCfg.Envsec.Provider != jetconfig.JetpackEnvsecProvider {
 		jetCfg.Envsec.Provider = jetconfig.JetpackEnvsecProvider
-		_, err = jetCfg.SaveConfig(path)
+		_, err = jetCfg.SaveConfig(curDir)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}

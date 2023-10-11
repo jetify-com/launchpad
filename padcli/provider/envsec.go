@@ -10,7 +10,7 @@ import (
 type EnvSec interface {
 	// string here refers to "selected provider"
 	Get(context.Context, string) (EnvSecConfig, error)
-	NewEnvId(ctx context.Context, projectId string, env string) (*envsec.EnvId, error)
+	NewEnvId(ctx context.Context, projectId string, env string) (*envsec.EnvID, error)
 }
 
 type EnvSecConfig interface {
@@ -33,8 +33,8 @@ func (p *defaultEnvSec) Get(ctx context.Context, selectedProvider string) (EnvSe
 	return nil, nil
 }
 
-func (p *defaultEnvSec) NewEnvId(_ctx context.Context, projectId string, env string) (*envsec.EnvId, error) {
+func (p *defaultEnvSec) NewEnvId(_ctx context.Context, projectId string, env string) (*envsec.EnvID, error) {
 	orgId := os.Getenv("LAUNCHPAD_ORG_ID")
-	envId, err := envsec.NewEnvId(projectId, orgId, env)
+	envId, err := envsec.NewEnvID(projectId, orgId, env)
 	return &envId, err
 }
