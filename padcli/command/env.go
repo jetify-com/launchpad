@@ -71,8 +71,9 @@ func envCmd() *cobra.Command {
 			}
 
 			envcli.BootstrapConfig(&envcli.CmdConfig{
-				Store: store,
-				EnvID: *envId,
+				Store:    store,
+				EnvID:    *envId,
+				EnvNames: []string{"DEV", "PROD", "STAGING"},
 			})
 			return nil
 		},
@@ -178,10 +179,10 @@ func envStore(
 			SessionToken:    providedConfig.GetSessionToken(),
 			KmsKeyID:        providedConfig.GetKmsKeyId(),
 			VarPathFn: func(envID envsec.EnvID, varName string) string {
-				return path.Join(envID.ProjectID, envID.EnvName, varName)
+				return path.Join("/jetpack-data/env", envID.ProjectID, envID.EnvName, varName)
 			},
 			PathNamespaceFn: func(envID envsec.EnvID) string {
-				return envID.ProjectID
+				return path.Join("/jetpack-data/env", envID.ProjectID)
 			},
 		}
 	}
