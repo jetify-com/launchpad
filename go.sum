@@ -815,6 +815,8 @@ go.etcd.io/etcd/client/pkg/v3 v3.5.0/go.mod h1:IJHfcCEKxYu1Os13ZdwCwIUTUVGYTSAM3
 go.etcd.io/etcd/client/v2 v2.305.0/go.mod h1:h9puh54ZTgAKtEbut2oe9P4L/oqKCVB6xsXlzd7alYQ=
 go.jetpack.io/envsec v0.0.7-0.20231011000253-d45638478a67 h1:BQrg449c+6Z2fPs/XqWBDrc293974ZarUY3BWMbAiX8=
 go.jetpack.io/envsec v0.0.7-0.20231011000253-d45638478a67/go.mod h1:zNb95BJk6arAGzIbePlqN/1V6uHotnDn89uMFWSFvIo=
+go.jetpack.io/envsec v0.0.7-0.20231011155224-77631d20ef09 h1:aj7/QBR81tDrR8587B9LO2cVyAzx79LMbbZHXF3RkXs=
+go.jetpack.io/envsec v0.0.7-0.20231011155224-77631d20ef09/go.mod h1:zNb95BJk6arAGzIbePlqN/1V6uHotnDn89uMFWSFvIo=
 go.jetpack.io/pkg v0.0.0-20231002215645-9afeb0623fd3 h1:aMydtVCHn7dfotOyV41VAxX5b5OOsCc4TxOXwDt38Yw=
 go.jetpack.io/pkg v0.0.0-20231002215645-9afeb0623fd3/go.mod h1:iaf3e/aENp5luwYFlfCxj+GsiwqHagbvRAY3bIdEgGA=
 go.jetpack.io/typeid v0.1.0 h1:suTmjNR3y2em2gCTG06agFfcACm3+zuxfziMUk5UXnw=

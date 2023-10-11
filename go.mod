@@ -36,7 +36,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stern/stern v1.24.0
 	github.com/stretchr/testify v1.8.4
-	go.jetpack.io/envsec v0.0.7-0.20231011000253-d45638478a67
+	go.jetpack.io/envsec v0.0.7-0.20231011155224-77631d20ef09
 	golang.org/x/crypto v0.14.0
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 	golang.org/x/mod v0.13.0
