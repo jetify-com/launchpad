@@ -2,11 +2,11 @@
 
 ### From Code to Kubernetes in One Step
 
-[![Join Discord](https://img.shields.io/discord/903306922852245526?color=7389D8&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/agbskCJXk2) ![License: Apache 2.0](https://img.shields.io/github/license/jetpack-io/devbox) [![version](https://img.shields.io/github/v/release/jetpack-io/launchpad?color=green&label=version&sort=semver)](https://github.com/jetpack-io/launchpad/releases) [![tests](https://github.com/jetpack-io/launchpad/actions/workflows/release.yaml/badge.svg)](https://github.com/jetpack-io/launchpad/actions/workflows/release.yaml?branch=main)
+[![Join Discord](https://img.shields.io/discord/903306922852245526?color=7389D8&label=discord&logo=discord&logoColor=ffffff)](https://discord.gg/jetify) ![License: Apache 2.0](https://img.shields.io/github/license/jetpack-io/devbox) [![version](https://img.shields.io/github/v/release/jetpack-io/launchpad?color=green&label=version&sort=semver)](https://github.com/jetify-com/launchpad/releases) [![tests](https://github.com/jetify-com/launchpad/actions/workflows/release.yaml/badge.svg)](https://github.com/jetify-com/launchpad/actions/workflows/release.yaml?branch=main)
 
 ## What is it?
 
-[Launchpad](https://www.jetpack.io/launchpad) is a command-line tool that lets you easily create applications on Kubernetes.
+[Launchpad](https://www.jetify.com/launchpad) is a command-line tool that lets you easily create applications on Kubernetes.
 
 In practice, Launchpad works similar to Heroku or Vercel, except everything is on Kubernetes.
 
@@ -14,7 +14,7 @@ In practice, Launchpad works similar to Heroku or Vercel, except everything is o
 
 The example below initializes a web project with `launchpad init`, and deploys to a local Kubernetes cluster with `launchpad up`:
 
-![screen cast](https://www.jetpack.io/assets/image/launchpad-docker-desktop-k.svg)
+![screen cast](https://www.jetify.com/assets/image/launchpad-docker-desktop-k.svg)
 
 ## Installing Launchpad
 
@@ -25,10 +25,8 @@ In addition to installing Launchpad itself, you will need to install `docker` si
 2. Install Launchpad:
 
    ```sh
-   curl -fsSL https://get.jetpack.io/launchpad | bash
+   curl -fsSL https://get.jetify.com/launchpad | bash
    ```
-
-Read more on the [Launchpad docs](http://www.jetpack.io/launchpad/docs/getting-started/any-image-to-k8s-5-min/).
 
 ## Benefits
 
@@ -39,10 +37,6 @@ Launchpad builds any image, publishes it to your Docker Registry, and deploys it
 ### A Heroku-like experience on your own Kubernetes cluster
 
 Ever wonder how you'd graduate from Heroku or a single EC2 machine to Kubernetes without going through a painful setup again? Faint not! With Launchpad, no manual migrations are required. In fact, developers can deploy and run their applications without needing to learn Kubernetes.
-
-### With Mission Control, onboarding new members is as easy as "launchpad up"
-
-Adding a new member to the team? Forget about Registry access, Cluster credentials, Kubernetes configurations, Namespace permissions, and a million other things to take care of. With Jetpack's Mission Control, Launchpad can automatically create all of the above for each new developer.
 
 ### Secret management built-in
 
@@ -100,8 +94,6 @@ In this quickstart, we’ll deploy a cron job to your local Docker Desktop Kuber
    > kubectl logs <pod_name>
    ```
 
-   [kubectl](https://www.jetpack.io/launchpad/docs/getting-started/any-image-to-k8s-5-min/#prerequisites), while not required, is a useful tool for inspecting and managing your deployments in Kubernetes.
-
 7. Clean up:
 
    ```bash
@@ -118,15 +110,12 @@ In this quickstart, we’ll deploy a cron job to your local Docker Desktop Kuber
 
 `launchpad cluster` - create a cluster, list your clusters (login required)
 
-All "login required" commands require you to have an account with [Jetpack's Mission Control](https://www.jetpack.io/launchpad) offering. These special commands are added on top of the open-source codebase for you. Even though they are excluded from this repository, they are readily available in the launchpad CLI.
-
-See the [CLI Reference](https://www.jetpack.io/launchpad/docs/reference/cli/) for the full list of commands.
 
 ## Join our Developer Community
 
-- Chat with us by joining the [Jetpack.io Discord Server](https://discord.gg/jetpack-io) – we have a #launchpad channel dedicated to this project.
-- File bug reports and feature requests using [Github Issues](https://github.com/jetpack-io/launchpad/issues)
-- Follow us on [Jetpack's Twitter](https://twitter.com/jetpack_io) for product updates
+- Chat with us by joining the [Jetify's Discord Server](https://discord.gg/jetify) – we have a #launchpad channel dedicated to this project.
+- File bug reports and feature requests using [Github Issues](https://github.com/jetify-com/launchpad/issues)
+- Follow us on [Jetpack's Twitter](https://twitter.com/jetify_com) for product updates
 
 ## Contributing
 
