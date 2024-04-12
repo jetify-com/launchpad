@@ -1,5 +1,5 @@
 /*
-Copyright 2021 Jetpack Technologies Inc.
+Copyright 2021 Jetify Inc.
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,7 +9,7 @@ You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-This file has been modified by Jetpack Technologies Inc to isolate flags that
+This file has been modified by Jetify Inc. to isolate flags that
 can be used when configuring a kubernetes client. The code is extracted from:
 https://github.com/kubernetes/cli-runtime/blob/master/pkg/genericclioptions/config_flags.go#L80
 */

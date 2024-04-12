@@ -233,7 +233,7 @@ func validateBuildPlan(plan *BuildPlan, fs afero.Fs) error {
 			"Dockerfile missing.\n" +
 				"- Please add a Dockerfile manually under your app directory.\n" +
 				"- You can find an example Dockerfile at " +
-				"https://github.com/jetpack-io/project-templates/blob/main/api/Dockerfile.\n" +
+				"https://github.com/jetify/project-templates/blob/main/api/Dockerfile.\n" +
 				"- Alternatively, to use a pre-existing image, you can add an Image: field to your service in" +
 				" launchpad.yaml or jetconfig.yaml.",
 		)

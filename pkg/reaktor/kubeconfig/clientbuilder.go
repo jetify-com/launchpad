@@ -1,5 +1,5 @@
 /*
-Copyright 2021 Jetpack Technologies Inc.
+Copyright 2021 Jetify Inc.
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,7 +9,7 @@ You may obtain a copy of the License at
 
 	http://www.apache.org/licenses/LICENSE-2.0
 
-This file has been modified by Jetpack Technologies Inc to:
+This file has been modified by Jetify Inc. to:
   - Support different ClientConfigs, depending on whether the kubeconfig is
     being provided via a file, in-cluster, or the contents are passed in directly.
   - The RESTClientGetter interface has been generalized to a ClientBuilder interface

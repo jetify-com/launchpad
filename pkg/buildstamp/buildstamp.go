@@ -41,7 +41,7 @@ var (
 	// VersionNumber is the version number in semver format MAJOR.MINOR.PATCH
 	VersionNumber string
 
-	// PrereleaseTag tells us what edition of Jetpack's Pre-releases this is. Usually, "dev".
+	// PrereleaseTag tells us what edition of Jetify's Pre-releases this is. Usually, "dev".
 	PrereleaseTag string
 
 	// CicdBuildRelease is set when the CLI binary was built through CICD

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 Jetpack Technologies Inc.
+Copyright 2021 Jetify Inc.
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,7 +9,7 @@ You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-This file has been modified by Jetpack Technologies Inc:
+This file has been modified by Jetify Inc.:
 + This an InClusterClientConfig that can be used publicly outside of the k8s
   code. As opposed to the original version which is private.
 
